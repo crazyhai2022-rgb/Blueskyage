@@ -26,9 +26,32 @@ function status_class(string $status): string {
     };
 }
 
+/**
+ * Everything that can be bought, keyed by the slug used in checkout URLs.
+ * 'recurring' marks a monthly subscription; products are one-time.
+ */
+function catalog(): array {
+    return [
+        // --- Ad account rental plans (monthly) ---
+        'basic'              => ['name' => 'Basic Plan — Meta Agency Ad Account', 'amount' => 1499, 'recurring' => true],
+        'pro'                => ['name' => 'Pro Plan — Meta Agency Ad Account',   'amount' => 2499, 'recurring' => true],
+        // --- One-time products ---
+        'facebook-page'      => ['name' => 'Facebook Page',              'amount' => 1499, 'recurring' => false],
+        'name-change-page'   => ['name' => 'Name Changeable Page',       'amount' => 1999, 'recurring' => false],
+        'old-profile'        => ['name' => '15 Years Old Profile',       'amount' => 2499, 'recurring' => false],
+        'verified-profile'   => ['name' => 'Identity Confirmed Profile', 'amount' => 8999, 'recurring' => false],
+        'instagram-account'  => ['name' => 'Instagram Account',          'amount' => 999,  'recurring' => false],
+    ];
+}
+
+/** Look up one catalog item, or null if the slug is unknown. */
+function catalog_item(string $slug): ?array {
+    $c = catalog();
+    $slug = strtolower(trim($slug));
+    return $c[$slug] ?? null;
+}
+
 function plan_amount(string $plan): int {
-    return match (strtolower($plan)) {
-        'pro' => 2499,
-        default => 1499,
-    };
+    $item = catalog_item($plan);
+    return $item ? $item['amount'] : 1499;
 }

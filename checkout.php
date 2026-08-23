@@ -5,9 +5,16 @@ require_once __DIR__ . '/includes/functions.php';
 
 $user = require_login(); // must be logged in to buy
 
-$plan   = $_GET['plan'] ?? 'Basic';
-$plan   = (stripos($plan, 'pro') !== false) ? 'Pro' : 'Basic';
-$amount = plan_amount($plan);
+$slug = $_GET['plan'] ?? $_GET['item'] ?? 'basic';
+$item = catalog_item($slug);
+if (!$item) {                       // unknown slug — send them back to the plans page
+    header('Location: services.html');
+    exit;
+}
+$slug      = strtolower(trim($slug));
+$plan      = $item['name'];
+$amount    = $item['amount'];
+$recurring = $item['recurring'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,17 +45,18 @@ $amount = plan_amount($plan);
 <section class="section" style="padding-top:40px;">
   <div class="container app-wrap">
     <div class="eyebrow">Checkout</div>
-    <h1 style="margin-bottom:24px;">Activate Your Ad Account</h1>
+    <h1 style="margin-bottom:24px;"><?= $recurring ? 'Activate Your Ad Account' : 'Complete Your Order' ?></h1>
 
     <div class="glass-card form-wrap" id="formCard">
       <div class="form-summary">
-        <span>Selected Plan</span>
-        <b><?= e($plan) ?> — ₹<?= (int)$amount ?>/mo</b>
+        <span><?= $recurring ? 'Selected Plan' : 'Selected Product' ?></span>
+        <b><?= e($plan) ?> — ₹<?= number_format($amount) ?><?= $recurring ? '/mo' : '' ?></b>
       </div>
 
       <div id="checkoutError" class="alert alert-error" style="display:none;"></div>
 
       <form id="checkoutForm">
+<?php if ($recurring): ?>
         <div class="form-group">
           <label for="bmid">Business Portfolio ID (BM ID)</label>
           <input type="text" id="bmid" name="bmid" placeholder="e.g. 123456789012345" required>
@@ -57,19 +65,27 @@ $amount = plan_amount($plan);
           <label for="business">Business Name</label>
           <input type="text" id="business" name="business" placeholder="Your business name">
         </div>
-        <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">Pay ₹<?= (int)$amount ?> &amp; Activate</button>
+<?php else: ?>
+        <div class="form-group">
+          <label for="business">Business / Brand Name <span style="color:var(--mist-dim);">(optional)</span></label>
+          <input type="text" id="business" name="business" placeholder="Where this will be used">
+        </div>
+<?php endif; ?>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">Pay ₹<?= number_format($amount) ?> &amp; <?= $recurring ? 'Activate' : 'Order' ?></button>
       </form>
       <p style="margin-top:14px;font-size:12.5px;color:var(--mist);text-align:center;">
-        After payment, your order appears instantly in your <a href="dashboard.php" style="color:var(--blue-light);">Dashboard</a> as "Preparing" — we'll confirm your account details there.
+        After payment, your order appears instantly in your <a href="dashboard.php" style="color:var(--blue-light);">Dashboard</a> as "Preparing" — we'll confirm the details there.
       </p>
     </div>
   </div>
 </section>
 
 <script>
+const planSlug = <?= json_encode($slug) ?>;
 const plan = <?= json_encode($plan) ?>;
 const amount = <?= (int)$amount ?>;
 const razorpayKeyId = <?= json_encode(RAZORPAY_KEY_ID) ?>;
+const payLabel = document.getElementById('payBtn').textContent;
 
 document.getElementById('checkoutForm').addEventListener('submit', async function(e){
   e.preventDefault();
@@ -79,7 +95,8 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
   payBtn.disabled = true;
   payBtn.textContent = 'Please wait…';
 
-  const bmid = document.getElementById('bmid').value.trim();
+  const bmidEl = document.getElementById('bmid');
+  const bmid = bmidEl ? bmidEl.value.trim() : '';
   const business = document.getElementById('business').value.trim();
 
   try {
@@ -87,7 +104,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     const res = await fetch('api/create_order.php', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ plan, amount, bmid, business })
+      body: JSON.stringify({ plan: planSlug, bmid, business })
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Could not start checkout.');
@@ -97,7 +114,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
       errBox.textContent = 'Payments are not fully set up yet. Contact the site admin (Razorpay keys missing or unreachable in config.php).';
       errBox.style.display = 'block';
       payBtn.disabled = false;
-      payBtn.textContent = 'Pay ₹' + amount + ' & Activate';
+      payBtn.textContent = payLabel;
       return;
     }
 
@@ -107,7 +124,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
       amount: data.razorpay_amount,
       currency: 'INR',
       name: 'BlueSky Agency',
-      description: plan + ' Plan — Ad Account Rental',
+      description: plan,
       image: 'assets/img/logo-mark.png',
       order_id: data.razorpay_order_id,
       prefill: { name: <?= json_encode($user['name']) ?>, email: <?= json_encode($user['email']) ?>, contact: <?= json_encode($user['phone']) ?> },
@@ -131,13 +148,13 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
           errBox.textContent = vData.error || 'Payment verification failed. Contact support.';
           errBox.style.display = 'block';
           payBtn.disabled = false;
-          payBtn.textContent = 'Pay ₹' + amount + ' & Activate';
+          payBtn.textContent = payLabel;
         }
       },
       modal: {
         ondismiss: function(){
           payBtn.disabled = false;
-          payBtn.textContent = 'Pay ₹' + amount + ' & Activate';
+          payBtn.textContent = payLabel;
         }
       }
     });
@@ -147,7 +164,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     errBox.textContent = err.message;
     errBox.style.display = 'block';
     payBtn.disabled = false;
-    payBtn.textContent = 'Pay ₹' + amount + ' & Activate';
+    payBtn.textContent = payLabel;
   }
 });
 </script>

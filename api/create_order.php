@@ -17,8 +17,14 @@ if (!$input) {
     exit;
 }
 
-$plan     = (stripos($input['plan'] ?? '', 'pro') !== false) ? 'Pro' : 'Basic';
-$amount   = plan_amount($plan); // trust server-side price, not client input
+// Resolve against the server-side catalog — never trust a price sent by the browser.
+$item = catalog_item($input['plan'] ?? '');
+if (!$item) {
+    echo json_encode(['ok' => false, 'error' => 'Unknown plan or product.']);
+    exit;
+}
+$plan     = $item['name'];
+$amount   = $item['amount'];
 $bmid     = trim($input['bmid'] ?? '');
 $business = trim($input['business'] ?? '');
 
