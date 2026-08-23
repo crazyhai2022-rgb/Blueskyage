@@ -1,15 +1,30 @@
 # Serve index.html as the homepage
 DirectoryIndex index.html index.php
 
-# Block direct web access to config files (they hold API keys)
-<FilesMatch "^(config\.php|config\.example\.php|\.cpanel\.yml|\.gitignore)$">
-  Require all denied
+# Block direct web access to config files (they hold API keys).
+# Wrapped in IfModule so an older Apache can't 500 on the syntax.
+<FilesMatch "^(config\.php|config\.example\.php|\.cpanel\.yml|\.gitignore|\.env)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
 </FilesMatch>
 
-# Block the old MySQL schema file if it is ever uploaded
-<FilesMatch "\.(sql|md|db)$">
-  Require all denied
+# Block schema/readme/database files if they ever land in public_html
+<FilesMatch "\.(sql|md|db|yml)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
 </FilesMatch>
 
 # Stop directory listings
-Options -Indexes
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
