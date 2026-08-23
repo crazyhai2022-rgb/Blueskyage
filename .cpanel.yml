@@ -13,7 +13,6 @@ deployment:
     - /bin/cp -f services.html $DEPLOYPATH
     - /bin/cp -f products.html $DEPLOYPATH
     - /bin/cp -f contact.html $DEPLOYPATH
-    - /bin/cp -f free-trial.html $DEPLOYPATH
     - /bin/cp -f checkout.html $DEPLOYPATH
     - /bin/cp -f get-started.html $DEPLOYPATH
 

@@ -128,26 +128,6 @@ Please confirm and activate my account.`;
   });
 }
 
-// --- FORM: FREE TRIAL ----------------------------------------------
-const trialForm = document.getElementById("trialForm");
-if (trialForm) {
-  trialForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(trialForm).entries());
-    const msg =
-`3-Day Free Trial Request
-----------------------------
-Name: ${data.name}
-Number: ${data.number}
-Business Name: ${data.business || "-"}
-BM ID: ${data.bmid}
-Email: ${data.email}
-----------------------------
-I'd like the full subscription details and to start my 3-day free trial.`;
-    openWhatsApp(msg);
-  });
-}
-
 // --- FORM: PRODUCT CHECKOUT -----------------------------------------
 const productForm = document.getElementById("productForm");
 if (productForm) {
