@@ -1,0 +1,18 @@
+<%- include('_head', { title: 'Admin Login' }) %>
+<section class="section" style="padding-top:90px;">
+  <div class="container app-wrap">
+    <div class="eyebrow">Admin Panel</div>
+    <h1 style="margin-bottom:24px;">Admin Login</h1>
+    <div class="glass-card form-wrap">
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <form method="POST" action="/admin/login">
+        <div class="form-group"><label for="username">Username</label>
+          <input type="text" id="username" name="username" required></div>
+        <div class="form-group"><label for="password">Password</label>
+          <input type="password" id="password" name="password" required></div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Log In</button>
+      </form>
+    </div>
+  </div>
+</section>
+<%- include('_foot') %>

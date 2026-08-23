@@ -1,0 +1,25 @@
+<%- include('_head', { title: 'Sign Up' }) %>
+<%- include('_nav') %>
+<section class="section" style="padding-top:60px;">
+  <div class="container app-wrap">
+    <div class="eyebrow">Create Account</div>
+    <h1 style="margin-bottom:24px;">Sign Up</h1>
+    <div class="glass-card form-wrap">
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <form method="POST" action="/signup">
+        <div class="form-group"><label for="name">Full Name</label>
+          <input type="text" id="name" name="name" value="<%= values.name || '' %>" required></div>
+        <div class="form-group"><label for="email">Email</label>
+          <input type="email" id="email" name="email" value="<%= values.email || '' %>" required></div>
+        <div class="form-group"><label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" value="<%= values.phone || '' %>" required></div>
+        <div class="form-group"><label for="password">Password</label>
+          <input type="password" id="password" name="password" minlength="6" required></div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
+      </form>
+      <p style="margin-top:18px;font-size:13.5px;color:var(--mist);text-align:center;">
+        Already have an account? <a href="/login" style="color:var(--blue-light);">Log In</a></p>
+    </div>
+  </div>
+</section>
+<%- include('_foot') %>

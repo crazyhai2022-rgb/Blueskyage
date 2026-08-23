@@ -1,0 +1,68 @@
+<%- include('_head', { title: 'Admin' }) %>
+<header class="navbar scrolled">
+  <div class="container nav-inner">
+    <a href="/" class="brand"><img src="/assets/img/logo-mark.png" alt="BlueSky Agency">
+      <span class="brand-word">BLUE<b>SKY</b></span></a>
+    <div class="nav-cta">
+      <span class="who" style="margin-right:14px;">Admin: <b><%= admin.username %></b></span>
+      <a href="/admin/logout" class="btn btn-ghost btn-sm">Log Out</a>
+    </div>
+  </div>
+</header>
+
+<section class="section" style="padding-top:40px;">
+  <div class="container app-wrap wide">
+    <div class="eyebrow">Admin Panel</div>
+    <h1 style="margin-bottom:24px;">All Orders &amp; Clients</h1>
+
+    <div class="admin-stat-row">
+      <div class="admin-stat"><span>Total Clients</span><b><%= stats.clients %></b></div>
+      <div class="admin-stat"><span>Preparing</span><b><%= stats.byStatus.paid_preparing || 0 %></b></div>
+      <div class="admin-stat"><span>Active</span><b><%= stats.byStatus.active || 0 %></b></div>
+      <div class="admin-stat"><span>Total Revenue</span><b>₹<%= money(stats.revenue) %></b></div>
+    </div>
+
+    <div class="inline-form" style="margin-bottom:18px;">
+      <% const tabs = [['all','All'],['pending_payment','Pending Payment'],['paid_preparing','Preparing'],['active','Active'],['cancelled','Cancelled']]; %>
+      <% tabs.forEach(function(t) { %>
+        <a href="/admin<%= t[0] === 'all' ? '' : '?status=' + t[0] %>" class="btn btn-ghost btn-sm"
+           <% if (filter === t[0]) { %>style="background:rgba(59,98,255,.25);"<% } %>><%= t[1] %></a>
+      <% }); %>
+    </div>
+
+    <div class="glass-card" style="padding:10px 20px;overflow-x:auto;">
+      <table class="admin-table">
+        <tr><th>Invoice</th><th>Client</th><th>Plan</th><th>Amount</th>
+            <th>BM ID</th><th>Slot ID</th><th>Status</th><th>Update</th></tr>
+        <% if (!orders.length) { %>
+          <tr><td colspan="8" style="text-align:center;color:var(--mist);padding:30px;">No orders found.</td></tr>
+        <% } %>
+        <% orders.forEach(function(o) { %>
+          <tr>
+            <td><%= o.invoice_no || ('#' + o.id) %></td>
+            <td><%= o.user_name %><br><span style="color:var(--mist-dim);font-size:11.5px;"><%= o.phone %></span></td>
+            <td><%= o.plan %></td>
+            <td>₹<%= money(o.amount) %></td>
+            <td><%= o.bm_id || '—' %></td>
+            <td><%= o.slot_id || '—' %></td>
+            <td><span class="<%= STATUS_CLASS[o.status] %>"><%= STATUS_LABEL[o.status] %></span></td>
+            <td>
+              <form method="POST" action="/admin/orders/<%= o.id %>" class="inline-form">
+                <input type="hidden" name="filter" value="<%= filter %>">
+                <input type="text" name="slot_id" placeholder="Slot (A7)" value="<%= o.slot_id || '' %>" style="width:80px;">
+                <input type="text" name="ad_account_id" placeholder="Ad Acc ID" value="<%= o.ad_account_id || '' %>" style="width:100px;">
+                <select name="status">
+                  <% Object.keys(STATUS_LABEL).forEach(function(s) { %>
+                    <option value="<%= s %>" <%= o.status === s ? 'selected' : '' %>><%= STATUS_LABEL[s] %></option>
+                  <% }); %>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </table>
+    </div>
+  </div>
+</section>
+<%- include('_foot') %>

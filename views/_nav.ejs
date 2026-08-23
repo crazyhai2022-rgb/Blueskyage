@@ -1,0 +1,21 @@
+<header class="navbar scrolled">
+  <div class="container nav-inner">
+    <a href="/" class="brand">
+      <img src="/assets/img/logo-mark.png" alt="BlueSky Agency">
+      <span class="brand-word">BLUE<b>SKY</b></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/services.html">Plans</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <% if (user) { %>
+        <a href="/dashboard" class="btn btn-ghost btn-sm">My Account</a>
+        <a href="/logout" class="btn btn-ghost btn-sm">Log Out</a>
+      <% } else { %>
+        <a href="/login" class="btn btn-ghost btn-sm">Log In</a>
+        <a href="/signup" class="btn btn-primary btn-sm">Sign Up</a>
+      <% } %>
+    </div>
+  </div>
+</header>

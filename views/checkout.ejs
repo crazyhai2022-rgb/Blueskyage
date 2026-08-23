@@ -1,0 +1,122 @@
+<%- include('_head', { title: 'Checkout', razorpayScript: true }) %>
+<header class="navbar scrolled">
+  <div class="container nav-inner">
+    <a href="/" class="brand"><img src="/assets/img/logo-mark.png" alt="BlueSky Agency">
+      <span class="brand-word">BLUE<b>SKY</b></span></a>
+    <div class="app-nav" style="margin:0;">
+      <span class="who">Logged in as <b><%= user.name %></b> · <a href="/dashboard" style="color:var(--blue-light);">Dashboard</a></span>
+    </div>
+  </div>
+</header>
+
+<section class="section" style="padding-top:40px;">
+  <div class="container app-wrap">
+    <div class="eyebrow">Checkout</div>
+    <h1 style="margin-bottom:24px;"><%= item.recurring ? 'Activate Your Ad Account' : 'Complete Your Order' %></h1>
+
+    <div class="glass-card form-wrap">
+      <div class="form-summary">
+        <span><%= item.recurring ? 'Selected Plan' : 'Selected Product' %></span>
+        <b><%= item.name %> — ₹<%= money(item.amount) %><%= item.recurring ? '/mo' : '' %></b>
+      </div>
+
+      <div id="checkoutError" class="alert alert-error" style="display:none;"></div>
+
+      <form id="checkoutForm">
+        <% if (item.recurring) { %>
+          <div class="form-group"><label for="bmid">Business Portfolio ID (BM ID)</label>
+            <input type="text" id="bmid" name="bmid" placeholder="e.g. 123456789012345" required></div>
+          <div class="form-group"><label for="business">Business Name</label>
+            <input type="text" id="business" name="business" placeholder="Your business name"></div>
+        <% } else { %>
+          <div class="form-group"><label for="business">Business / Brand Name <span style="color:var(--mist-dim);">(optional)</span></label>
+            <input type="text" id="business" name="business" placeholder="Where this will be used"></div>
+        <% } %>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">Pay ₹<%= money(item.amount) %> &amp; <%= item.recurring ? 'Activate' : 'Order' %></button>
+      </form>
+
+      <p style="margin-top:14px;font-size:12.5px;color:var(--mist);text-align:center;">
+        After payment, your order appears instantly in your <a href="/dashboard" style="color:var(--blue-light);">Dashboard</a> as "Preparing".
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+const planSlug = <%- JSON.stringify(slug) %>;
+const planName = <%- JSON.stringify(item.name) %>;
+const amount = <%= item.amount %>;
+const razorpayKeyId = <%- JSON.stringify(razorpayKeyId) %>;
+const buyer = <%- JSON.stringify({ name: user.name, email: user.email, contact: user.phone }) %>;
+
+const form = document.getElementById('checkoutForm');
+const errBox = document.getElementById('checkoutError');
+const payBtn = document.getElementById('payBtn');
+const payLabel = payBtn.textContent;
+
+function showError(msg) {
+  errBox.textContent = msg;
+  errBox.style.display = 'block';
+  payBtn.disabled = false;
+  payBtn.textContent = payLabel;
+}
+
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  errBox.style.display = 'none';
+  payBtn.disabled = true;
+  payBtn.textContent = 'Please wait…';
+
+  const bmidEl = document.getElementById('bmid');
+
+  try {
+    const res = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: planSlug,
+        bmid: bmidEl ? bmidEl.value.trim() : '',
+        business: document.getElementById('business').value.trim()
+      })
+    });
+    const data = await res.json();
+    if (!data.ok) return showError(data.error || 'Could not start checkout.');
+
+    if (!data.razorpay_order_id) {
+      return showError('Payments are not set up yet. Please contact us on WhatsApp to complete this order.');
+    }
+
+    const rzp = new Razorpay({
+      key: razorpayKeyId,
+      amount: data.razorpay_amount,
+      currency: 'INR',
+      name: 'BlueSky Agency',
+      description: planName,
+      image: '/assets/img/logo-mark.png',
+      order_id: data.razorpay_order_id,
+      prefill: buyer,
+      theme: { color: '#3b62ff' },
+      handler: async function (response) {
+        const vRes = await fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: data.order_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature
+          })
+        });
+        const vData = await vRes.json();
+        if (vData.ok) window.location.href = '/dashboard?paid=1';
+        else showError(vData.error || 'Payment verification failed. Contact support.');
+      },
+      modal: { ondismiss: function () { showError('Payment cancelled.'); } }
+    });
+    rzp.open();
+  } catch (err) {
+    showError('Something went wrong. Please try again.');
+  }
+});
+</script>
+<%- include('_foot') %>

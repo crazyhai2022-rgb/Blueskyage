@@ -1,0 +1,22 @@
+<%- include('_head', { title: 'Log In' }) %>
+<%- include('_nav') %>
+<section class="section" style="padding-top:60px;">
+  <div class="container app-wrap">
+    <div class="eyebrow">Welcome Back</div>
+    <h1 style="margin-bottom:24px;">Log In</h1>
+    <div class="glass-card form-wrap">
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <form method="POST" action="/login">
+        <input type="hidden" name="redirect" value="<%= redirect %>">
+        <div class="form-group"><label for="email">Email</label>
+          <input type="email" id="email" name="email" value="<%= email %>" required></div>
+        <div class="form-group"><label for="password">Password</label>
+          <input type="password" id="password" name="password" required></div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Log In</button>
+      </form>
+      <p style="margin-top:18px;font-size:13.5px;color:var(--mist);text-align:center;">
+        New here? <a href="/signup" style="color:var(--blue-light);">Create an account</a></p>
+    </div>
+  </div>
+</section>
+<%- include('_foot') %>

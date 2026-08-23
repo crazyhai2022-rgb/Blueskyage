@@ -1,0 +1,48 @@
+<%- include('_head', { title: 'Dashboard' }) %>
+<%- include('_nav') %>
+<section class="section" style="padding-top:40px;">
+  <div class="container app-wrap wide">
+    <div class="app-nav">
+      <div><div class="eyebrow">Your Account</div><h1 style="margin-bottom:0;">Dashboard</h1></div>
+      <span class="who">Logged in as <b><%= user.name %></b></span>
+    </div>
+
+    <% if (paid) { %>
+      <div class="alert alert-success">Payment received! Your order is now <b>Preparing</b> — we'll confirm your account details here shortly.</div>
+    <% } %>
+
+    <% if (!orders.length) { %>
+      <div class="glass-card" style="text-align:center;padding:50px 30px;">
+        <p style="color:var(--mist);margin-bottom:20px;">You don't have any orders yet.</p>
+        <a href="/services.html" class="btn btn-primary">View Plans</a>
+      </div>
+    <% } %>
+
+    <% orders.forEach(function(o) { %>
+      <div class="order-card">
+        <div class="order-card-top">
+          <div>
+            <h3><%= o.plan %> — ₹<%= money(o.amount) %><%= o.plan.indexOf('Plan') !== -1 ? '/mo' : '' %></h3>
+            <span><%= o.invoice_no || ('Order #' + o.id) %> · <%= formatDate(o.created_at) %></span>
+          </div>
+          <span class="<%= STATUS_CLASS[o.status] %>"><%= STATUS_LABEL[o.status] %></span>
+        </div>
+
+        <% if (o.status === 'pending_payment') { %>
+          <p style="font-size:13px;color:var(--mist);">Payment not completed.</p>
+        <% } else if (o.status === 'paid_preparing') { %>
+          <p style="font-size:13px;color:var(--mist);">Your payment is confirmed — our team is setting up your order. This usually takes a few hours.</p>
+        <% } else if (o.status === 'active') { %>
+          <div class="order-details">
+            <div><span>Ad Account Number</span><b><%= o.slot_id || '—' %></b></div>
+            <div><span>Business Portfolio ID</span><b><%= o.bm_id || '—' %></b></div>
+            <div><span>Status</span><b>Live &amp; Active</b></div>
+          </div>
+        <% } else { %>
+          <p style="font-size:13px;color:var(--mist);">This order was cancelled.</p>
+        <% } %>
+      </div>
+    <% }); %>
+  </div>
+</section>
+<%- include('_foot') %>
