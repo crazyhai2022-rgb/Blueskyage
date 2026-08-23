@@ -1,0 +1,15 @@
+# Serve index.html as the homepage
+DirectoryIndex index.html index.php
+
+# Block direct web access to config files (they hold API keys)
+<FilesMatch "^(config\.php|config\.example\.php|\.cpanel\.yml|\.gitignore)$">
+  Require all denied
+</FilesMatch>
+
+# Block the old MySQL schema file if it is ever uploaded
+<FilesMatch "\.(sql|md|db)$">
+  Require all denied
+</FilesMatch>
+
+# Stop directory listings
+Options -Indexes

@@ -1,9 +1,12 @@
 ---
 deployment:
   tasks:
-    # Replace CPANELUSER below with your actual cPanel username.
-    # Find it in cPanel → top-right, or under "General Information".
-    - export DEPLOYPATH=/home/CPANELUSER/public_html
+    # $HOME resolves to your cPanel account automatically — no editing needed.
+    - export DEPLOYPATH=$HOME/public_html
+    - /bin/mkdir -p $DEPLOYPATH
+
+    # Server rules (blocks web access to config files)
+    - /bin/cp -f .htaccess $DEPLOYPATH
 
     # Pages
     - /bin/cp -f index.html $DEPLOYPATH
@@ -22,16 +25,16 @@ deployment:
     - /bin/cp -f checkout.php $DEPLOYPATH
     - /bin/cp -f config.example.php $DEPLOYPATH
 
-    # Folders
+    # Backend + assets
     - /bin/mkdir -p $DEPLOYPATH/includes $DEPLOYPATH/api $DEPLOYPATH/admin
     - /bin/mkdir -p $DEPLOYPATH/assets/css $DEPLOYPATH/assets/js $DEPLOYPATH/assets/img
     - /bin/cp -f includes/*.php $DEPLOYPATH/includes/
+    - /bin/cp -f includes/.htaccess $DEPLOYPATH/includes/
     - /bin/cp -f api/*.php $DEPLOYPATH/api/
     - /bin/cp -f admin/*.php $DEPLOYPATH/admin/
     - /bin/cp -f assets/css/*.css $DEPLOYPATH/assets/css/
     - /bin/cp -f assets/js/*.js $DEPLOYPATH/assets/js/
     - /bin/cp -f assets/img/* $DEPLOYPATH/assets/img/
 
-    # Keep config.php private (it holds your API keys) — it is never
-    # copied here, so your live config is safe from every deploy.
-    - /bin/chmod 600 $DEPLOYPATH/config.php || true
+    # config.php holds your API keys and is deliberately NOT deployed,
+    # so your live keys survive every deploy untouched.
