@@ -23,6 +23,8 @@ deployment:
     - /bin/cp -f dashboard.php $DEPLOYPATH
     - /bin/cp -f checkout.php $DEPLOYPATH
     - /bin/cp -f config.example.php $DEPLOYPATH
+    - /bin/cp -f cart.php $DEPLOYPATH
+    - /bin/cp -f cart-action.php $DEPLOYPATH
 
     # Backend + assets
     - /bin/mkdir -p $DEPLOYPATH/includes $DEPLOYPATH/api $DEPLOYPATH/admin

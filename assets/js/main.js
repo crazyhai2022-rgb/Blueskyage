@@ -173,3 +173,21 @@ Message: ${data.message || "-"}`;
     openWhatsApp(msg);
   });
 }
+
+// --- CART BADGE ------------------------------------------------------
+// Static pages can be cached, so the count is fetched rather than baked in.
+(function () {
+  const badges = document.querySelectorAll("[data-cart-count]");
+  if (!badges.length) return;
+
+  fetch("api/cart_count.php", { credentials: "same-origin" })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (!data) return;
+      badges.forEach((b) => {
+        b.textContent = data.count;
+        b.hidden = data.count === 0;
+      });
+    })
+    .catch(() => {});
+})();

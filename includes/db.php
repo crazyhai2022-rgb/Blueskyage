@@ -158,7 +158,19 @@ class SupabaseStatement {
             }
             $this->rows = array_values($grouped);
 
-        } elseif (preg_match('/^SELECT COUNT\(\*\) AS c FROM orders WHERE invoice_no IS NOT NULL$/i', $sql)) {
+        } elseif (preg_match("/^INSERT INTO orders \\(user_id, plan, amount, bm_id, business_name, status, razorpay_order_id\\) VALUES \\(\\?, \\?, \\?, \\?, \\?, 'pending_payment', \\?\\)\$/i", $sql)) {
+            $res = $this->db->request('POST', 'orders', [
+                'user_id' => (int)$params[0], 'plan' => $params[1], 'amount' => (int)$params[2],
+                'bm_id' => $params[3], 'business_name' => $params[4],
+                'status' => 'pending_payment', 'razorpay_order_id' => $params[5],
+            ]);
+            $this->db->lastInsertIdValue = $res[0]['id'] ?? null;
+
+        } elseif (preg_match('/^SELECT \\* FROM orders WHERE razorpay_order_id = \\? AND user_id = \\?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'orders?select=*&razorpay_order_id=eq.'
+                . rawurlencode($params[0]) . '&user_id=eq.' . (int)$params[1]);
+
+        } elseif (preg_match('/^SELECT COUNT\\(\\*\\) AS c FROM orders WHERE invoice_no IS NOT NULL$/i', $sql)) {
             $all = $this->db->request('GET', 'orders?select=id&invoice_no=not.is.null');
             $this->rows = [['c' => count($all)]];
 

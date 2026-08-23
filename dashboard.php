@@ -8,7 +8,8 @@ $stmt = get_db()->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY creat
 $stmt->execute([$user['id']]);
 $orders = $stmt->fetchAll();
 
-$justPaid = isset($_GET['paid']);
+$justPaid   = isset($_GET['paid']);
+$justPlaced = isset($_GET['placed']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,6 +52,8 @@ $justPaid = isset($_GET['paid']);
 
     <?php if ($justPaid): ?>
       <div class="alert alert-success">Payment received! Your order is now <b>Preparing</b> — we'll confirm your account details here shortly.</div>
+    <?php elseif ($justPlaced): ?>
+      <div class="alert alert-success">Order placed! It's saved below as <b>Pending Payment</b> — message us on WhatsApp and we'll share the payment details and get you set up.</div>
     <?php endif; ?>
 
     <?php if (!$orders): ?>

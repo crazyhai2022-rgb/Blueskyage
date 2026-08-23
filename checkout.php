@@ -1,20 +1,28 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/auth.php';
-require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/cart.php';
 
-$user = require_login(); // must be logged in to buy
+$user = require_login();
 
-$slug = $_GET['plan'] ?? $_GET['item'] ?? 'basic';
-$item = catalog_item($slug);
-if (!$item) {                       // unknown slug — send them back to the plans page
-    header('Location: services.html');
+// Landing here with ?plan=slug (from a "Buy Now" button) adds that item first.
+if (!empty($_GET['plan'])) {
+    cart_add($_GET['plan']);
+    header('Location: checkout.php');
     exit;
 }
-$slug      = strtolower(trim($slug));
-$plan      = $item['name'];
-$amount    = $item['amount'];
-$recurring = $item['recurring'];
+
+if (cart_is_empty()) {
+    header('Location: cart.php');
+    exit;
+}
+
+$items         = cart_items();
+$total         = cart_total();
+$needsBmId     = cart_has_recurring();
+$paymentsReady = defined('RAZORPAY_KEY_ID')
+    && RAZORPAY_KEY_ID !== 'YOUR_RAZORPAY_KEY_ID'
+    && RAZORPAY_KEY_ID !== '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +32,9 @@ $recurring = $item['recurring'];
 <title>Checkout — BlueSky Agency</title>
 <link rel="icon" href="assets/img/logo-mark.png">
 <link rel="stylesheet" href="assets/css/style.css">
+<?php if ($paymentsReady): ?>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<?php endif; ?>
 </head>
 <body>
 <div class="bg-mesh"></div>
@@ -37,137 +47,143 @@ $recurring = $item['recurring'];
       <span class="brand-word">BLUE<b>SKY</b></span>
     </a>
     <div class="app-nav" style="margin:0;">
-      <span class="who">Logged in as <b><?= e($user['name']) ?></b> · <a href="dashboard.php" style="color:var(--blue-light);">Dashboard</a></span>
+      <span class="who">Logged in as <b><?= e($user['name']) ?></b> &middot;
+        <a href="dashboard.php" style="color:var(--blue-light);">Dashboard</a></span>
     </div>
   </div>
 </header>
 
 <section class="section" style="padding-top:40px;">
-  <div class="container app-wrap">
+  <div class="container app-wrap wide">
     <div class="eyebrow">Checkout</div>
-    <h1 style="margin-bottom:24px;"><?= $recurring ? 'Activate Your Ad Account' : 'Complete Your Order' ?></h1>
+    <h1 style="margin-bottom:24px;">Review &amp; Confirm</h1>
 
-    <div class="glass-card form-wrap" id="formCard">
-      <div class="form-summary">
-        <span><?= $recurring ? 'Selected Plan' : 'Selected Product' ?></span>
-        <b><?= e($plan) ?> — ₹<?= number_format($amount) ?><?= $recurring ? '/mo' : '' ?></b>
+    <div class="checkout-grid">
+
+      <div class="glass-card">
+        <h3 class="ck-heading">Order Summary</h3>
+        <?php foreach ($items as $i): ?>
+          <div class="ck-line">
+            <div>
+              <b><?= e($i['name']) ?></b>
+              <span><?= $i['recurring'] ? 'Monthly' : 'One-time' ?><?= $i['qty'] > 1 ? ' &times; ' . $i['qty'] : '' ?></span>
+            </div>
+            <span class="ck-amt">&#8377;<?= number_format($i['subtotal']) ?></span>
+          </div>
+        <?php endforeach; ?>
+        <div class="ck-total">
+          <span>Total</span><b>&#8377;<?= number_format($total) ?></b>
+        </div>
+        <a href="cart.php" class="ck-edit">&larr; Edit cart</a>
       </div>
 
-      <div id="checkoutError" class="alert alert-error" style="display:none;"></div>
+      <div class="glass-card form-wrap" style="margin:0;">
+        <div id="checkoutError" class="alert alert-error" style="display:none;"></div>
 
-      <form id="checkoutForm">
-<?php if ($recurring): ?>
-        <div class="form-group">
-          <label for="bmid">Business Portfolio ID (BM ID)</label>
-          <input type="text" id="bmid" name="bmid" placeholder="e.g. 123456789012345" required>
-        </div>
-        <div class="form-group">
-          <label for="business">Business Name</label>
-          <input type="text" id="business" name="business" placeholder="Your business name">
-        </div>
-<?php else: ?>
-        <div class="form-group">
-          <label for="business">Business / Brand Name <span style="color:var(--mist-dim);">(optional)</span></label>
-          <input type="text" id="business" name="business" placeholder="Where this will be used">
-        </div>
-<?php endif; ?>
-        <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">Pay ₹<?= number_format($amount) ?> &amp; <?= $recurring ? 'Activate' : 'Order' ?></button>
-      </form>
-      <p style="margin-top:14px;font-size:12.5px;color:var(--mist);text-align:center;">
-        After payment, your order appears instantly in your <a href="dashboard.php" style="color:var(--blue-light);">Dashboard</a> as "Preparing" — we'll confirm the details there.
-      </p>
+        <form id="checkoutForm">
+          <?php if ($needsBmId): ?>
+            <div class="form-group">
+              <label for="bmid">Business Portfolio ID (BM ID)</label>
+              <input type="text" id="bmid" name="bmid" placeholder="e.g. 123456789012345" required>
+            </div>
+          <?php endif; ?>
+
+          <div class="form-group">
+            <label for="business">Business / Brand Name
+              <?php if (!$needsBmId): ?><span style="color:var(--mist-dim);">(optional)</span><?php endif; ?></label>
+            <input type="text" id="business" name="business" placeholder="Your business name" <?= $needsBmId ? 'required' : '' ?>>
+          </div>
+
+          <?php if ($paymentsReady): ?>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">Pay &#8377;<?= number_format($total) ?></button>
+            <p class="ck-foot">Secure payment via Razorpay. Your order appears in your <a href="dashboard.php">Dashboard</a> right after.</p>
+          <?php else: ?>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">Place Order &mdash; &#8377;<?= number_format($total) ?></button>
+            <p class="ck-foot">Online payment isn't switched on yet, so we'll confirm this order over WhatsApp and share payment details there.</p>
+          <?php endif; ?>
+        </form>
+      </div>
+
     </div>
   </div>
 </section>
 
 <script>
-const planSlug = <?= json_encode($slug) ?>;
-const plan = <?= json_encode($plan) ?>;
-const amount = <?= (int)$amount ?>;
-const razorpayKeyId = <?= json_encode(RAZORPAY_KEY_ID) ?>;
-const payLabel = document.getElementById('payBtn').textContent;
+const paymentsReady = <?= $paymentsReady ? 'true' : 'false' ?>;
+const razorpayKeyId = <?= json_encode($paymentsReady ? RAZORPAY_KEY_ID : '') ?>;
+const buyer = <?= json_encode(['name' => $user['name'], 'email' => $user['email'], 'contact' => $user['phone']]) ?>;
 
-document.getElementById('checkoutForm').addEventListener('submit', async function(e){
+const form = document.getElementById('checkoutForm');
+const errBox = document.getElementById('checkoutError');
+const payBtn = document.getElementById('payBtn');
+const payLabel = payBtn.textContent.trim();
+
+function showError(msg) {
+  errBox.textContent = msg;
+  errBox.style.display = 'block';
+  payBtn.disabled = false;
+  payBtn.textContent = payLabel;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+form.addEventListener('submit', async function (e) {
   e.preventDefault();
-  const errBox = document.getElementById('checkoutError');
-  const payBtn = document.getElementById('payBtn');
   errBox.style.display = 'none';
   payBtn.disabled = true;
-  payBtn.textContent = 'Please wait…';
+  payBtn.textContent = 'Please wait\u2026';
 
   const bmidEl = document.getElementById('bmid');
-  const bmid = bmidEl ? bmidEl.value.trim() : '';
-  const business = document.getElementById('business').value.trim();
 
   try {
-    // 1. Create a pending order on our server + a Razorpay order
     const res = await fetch('api/create_order.php', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ plan: planSlug, bmid, business })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bmid: bmidEl ? bmidEl.value.trim() : '',
+        business: document.getElementById('business').value.trim()
+      })
     });
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Could not start checkout.');
+    if (!data.ok) return showError(data.error || 'Could not place your order.');
 
     if (!data.razorpay_order_id) {
-      // Razorpay keys not configured yet, or the order call failed
-      errBox.textContent = 'Payments are not fully set up yet. Contact the site admin (Razorpay keys missing or unreachable in config.php).';
-      errBox.style.display = 'block';
-      payBtn.disabled = false;
-      payBtn.textContent = payLabel;
+      window.location.href = 'dashboard.php?placed=1';
       return;
     }
 
-    // 2. Open Razorpay checkout
     const rzp = new Razorpay({
       key: razorpayKeyId,
       amount: data.razorpay_amount,
       currency: 'INR',
       name: 'BlueSky Agency',
-      description: plan,
+      description: 'Order #' + data.group_id,
       image: 'assets/img/logo-mark.png',
       order_id: data.razorpay_order_id,
-      prefill: { name: <?= json_encode($user['name']) ?>, email: <?= json_encode($user['email']) ?>, contact: <?= json_encode($user['phone']) ?> },
+      prefill: buyer,
       theme: { color: '#3b62ff' },
-      handler: async function(response){
-        // 3. Verify payment on server
+      handler: async function (response) {
         const vRes = await fetch('api/verify_payment.php', {
           method: 'POST',
-          headers: {'Content-Type':'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            order_id: data.order_id,
+            group_id: data.group_id,
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature
           })
         });
         const vData = await vRes.json();
-        if (vData.ok) {
-          window.location.href = 'dashboard.php?paid=1';
-        } else {
-          errBox.textContent = vData.error || 'Payment verification failed. Contact support.';
-          errBox.style.display = 'block';
-          payBtn.disabled = false;
-          payBtn.textContent = payLabel;
-        }
+        if (vData.ok) window.location.href = 'dashboard.php?paid=1';
+        else showError(vData.error || 'Payment verification failed. Please contact support.');
       },
-      modal: {
-        ondismiss: function(){
-          payBtn.disabled = false;
-          payBtn.textContent = payLabel;
-        }
-      }
+      modal: { ondismiss: function () { showError('Payment cancelled \u2014 your order is saved as pending.'); } }
     });
     rzp.open();
-
   } catch (err) {
-    errBox.textContent = err.message;
-    errBox.style.display = 'block';
-    payBtn.disabled = false;
-    payBtn.textContent = payLabel;
+    showError('Something went wrong. Please try again.');
   }
 });
 </script>
-
+<script src="assets/js/main.js"></script>
 </body>
 </html>
