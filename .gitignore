@@ -1,0 +1,4 @@
+config.php
+trial.db
+*.log
+.DS_Store
