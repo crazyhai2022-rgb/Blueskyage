@@ -188,8 +188,8 @@ Message: ${data.message || "-"}`;
 
     function setShown(shown) {
       input.type = shown ? 'text' : 'password';
-      openEye.hidden = shown;
-      shutEye.hidden = !shown;
+      openEye.hidden = !shown;
+      shutEye.hidden = shown;
       const label = shown ? 'Hide password' : 'Show password';
       btn.setAttribute('aria-label', label);
       btn.setAttribute('title', label);
