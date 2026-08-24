@@ -48,7 +48,9 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
 
     <div class="ck-hero">
       <div class="ck-logo-ring">
-        <img src="assets/img/logo-mark.png" alt="">
+        <span class="ck-ring ck-ring-1"></span>
+          <span class="ck-ring ck-ring-2"></span>
+          <img src="assets/img/logo-mark.png" alt="" class="ck-logo">
       </div>
       <div>
         <div class="eyebrow">Secure Checkout</div>
@@ -96,13 +98,6 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
           <p class="ck-coupon-msg" id="couponMsg"></p>
         </div>
 
-        <?php if ($item['recurring']): ?>
-          <ul class="ck-perks">
-            <li>Unlimited spending limit</li>
-            <li>Instant replacement, unlimited times</li>
-            <li>24/7 priority support</li>
-          </ul>
-        <?php endif; ?>
       </div>
 
       <!-- DETAILS -->
@@ -171,13 +166,20 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
 
           <p class="ck-foot">
             <?php if ($paymentsReady): ?>
-              Secure payment via Razorpay. Your order shows up in your
+              Your payment is encrypted and processed securely by Razorpay &mdash; the moment it's confirmed, your order lands in your
               <a href="dashboard.php">Dashboard</a> instantly.
             <?php else: ?>
               Online payment isn't switched on yet &mdash; we'll confirm this order
               on WhatsApp and share payment details there.
             <?php endif; ?>
           </p>
+            <?php if ($paymentsReady): ?>
+    <div class="ck-badge">
+        <a href="https://razorpay.com/" target="_blank" rel="noopener">
+            <img referrerpolicy="origin" src="https://badges.razorpay.com/badge-dark.png" alt="Payments powered by Razorpay">
+        </a>
+    </div>
+            <?php endif; ?>
         </form>
       </div>
 
