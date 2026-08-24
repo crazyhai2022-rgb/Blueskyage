@@ -172,7 +172,6 @@ $memberSince = !empty($user['created_at'])
         <div class="eyebrow">Your Account</div>
         <h1 style="margin-bottom:0;">My Profile</h1>
       </div>
-      <a href="/dashboard" class="btn btn-ghost btn-sm">← Dashboard</a>
     </div>
 
     <?php if ($ok): ?>
