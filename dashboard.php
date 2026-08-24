@@ -31,7 +31,6 @@ $justPlaced = isset($_GET['placed']);
       <span class="brand-word">BLUE<b>SKY</b></span>
     </a>
     <nav class="nav-links">
-      <a href="/services">Plans</a>
       <a href="/contact">Contact</a>
     </nav>
     <div class="nav-cta">
