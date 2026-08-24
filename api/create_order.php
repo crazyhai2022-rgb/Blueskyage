@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
-require_once __DIR__ . '/../includes/coupons.php';
 
 header('Content-Type: application/json');
 
@@ -14,58 +13,52 @@ if (!$user) {
 
 $input = json_decode(file_get_contents('php://input'), true) ?: [];
 
-// Price always comes from the server-side catalog, never from the browser.
+// Price always comes from the server-side catalog, never the request body.
 $item = catalog_item($input['plan'] ?? '');
 if (!$item) {
     echo json_encode(['ok' => false, 'error' => 'Unknown plan or product.']);
     exit;
 }
 
-$slug     = strtolower(trim($input['plan']));
-$original = (int)$item['amount'];
-$amount   = $original;
+$db       = get_db();
+$original = $item['amount'];
 $discount = 0;
 $couponCode = null;
+$coupon   = null;
 
-// Re-check the coupon here — the browser's number is never trusted.
+// Re-validate the coupon here — the browser's word isn't enough.
 if (!empty($input['coupon'])) {
-    $check = coupon_lookup($input['coupon']);
-    if ($check['ok']) {
-        $applied    = coupon_apply($original, $check['coupon']);
-        $amount     = $applied['final'];
-        $discount   = $applied['discount'];
-        $couponCode = strtoupper(trim($input['coupon']));
+    $res = coupon_lookup($db, $input['coupon']);
+    if (!$res['ok']) {
+        echo json_encode(['ok' => false, 'error' => $res['error']]);
+        exit;
     }
+    $coupon     = $res['coupon'];
+    $couponCode = strtoupper(trim($input['coupon']));
+    $discount   = coupon_discount($original, (int)$coupon['percent_off']);
 }
 
-// Keep only the fields this item actually asks for, plus free-text notes.
-$allowed = array_column(item_fields($slug), 0);
-$allowed[] = 'notes';
-$posted  = is_array($input['details'] ?? null) ? $input['details'] : [];
-
-$details = [];
-foreach ($allowed as $key) {
-    // mb_* isn't guaranteed on shared hosting, so fall back to substr.
-    if (!empty($posted[$key])) {
-        $val = trim((string)$posted[$key]);
-        $details[$key] = function_exists('mb_substr') ? mb_substr($val, 0, 500) : substr($val, 0, 500);
-    }
-}
-
-$bmid     = $details['bmid'] ?? '';
-$business = $details['business'] ?? '';
-
-$db = get_db();
+$amount = $original - $discount;
 
 $stmt = $db->prepare(
-    "INSERT INTO orders (user_id, plan, amount, bm_id, business_name, status, details, coupon_code, discount, original_amount)
-     VALUES (?, ?, ?, ?, ?, 'pending_payment', ?, ?, ?, ?)"
+    "INSERT INTO orders (user_id, plan, amount, bm_id, business_name, status, coupon_code, discount, original_amount)
+     VALUES (?, ?, ?, ?, ?, 'pending_payment', ?, ?, ?)"
 );
 $stmt->execute([
-    $user['id'], $item['name'], $amount, $bmid, $business,
-    json_encode($details, JSON_UNESCAPED_UNICODE), $couponCode, $discount, $original,
+    $user['id'],
+    $item['name'],
+    $amount,
+    trim($input['bmid'] ?? ''),
+    trim($input['business'] ?? ''),
+    $couponCode,
+    $discount,
+    $original,
 ]);
 $orderId = (int)$db->lastInsertId();
+
+if ($coupon) {
+    $db->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?")->execute([$coupon['id']]);
+}
 
 // Ask Razorpay for a payment order — skipped cleanly when keys aren't set.
 $razorpayOrderId = null;
@@ -100,8 +93,6 @@ if (function_exists('curl_init') && $keysReady) {
         }
     }
 }
-
-if ($couponCode) coupon_mark_used($couponCode);
 
 echo json_encode([
     'ok'                => true,

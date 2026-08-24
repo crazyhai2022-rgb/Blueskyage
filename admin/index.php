@@ -77,7 +77,7 @@ foreach ($stats as $s) {
     <div class="glass-card" style="padding:10px 20px;overflow-x:auto;">
       <table class="admin-table">
         <tr>
-          <th>Invoice</th><th>Client</th><th>Plan</th><th>Amount</th>
+          <th>Invoice</th><th>Client</th><th>Plan</th><th>Amount</th><th>Coupon</th>
           <th>BM ID</th><th>Slot ID</th><th>Status</th><th>Update</th>
         </tr>
         <?php foreach ($orders as $o): ?>
@@ -85,7 +85,8 @@ foreach ($stats as $s) {
           <td><?= e($o['invoice_no'] ?: '#' . $o['id']) ?></td>
           <td><?= e($o['user_name']) ?><br><span style="color:var(--mist-dim);font-size:11.5px;"><?= e($o['phone']) ?></span></td>
           <td><?= e($o['plan']) ?></td>
-          <td>₹<?= (int)$o['amount'] ?></td>
+          <td>₹<?= (int)$o['amount'] ?><?php if (!empty($o['discount'])): ?><br><span style="color:var(--mist-dim);font-size:11px;text-decoration:line-through;">₹<?= (int)$o['original_amount'] ?></span><?php endif; ?></td>
+            <td><?= !empty($o['coupon_code']) ? '<span class="badge badge-green">' . e($o['coupon_code']) . '</span>' : '—' ?></td>
           <td>
           <?= e($o['bm_id'] ?: '—') ?>
           <?php
@@ -125,7 +126,7 @@ foreach ($stats as $s) {
         </tr>
         <?php endforeach; ?>
         <?php if (!$orders): ?>
-        <tr><td colspan="8" style="text-align:center;color:var(--mist);padding:30px;">No orders found.</td></tr>
+        <tr><td colspan="9" style="text-align:center;color:var(--mist);padding:30px;">No orders found.</td></tr>
         <?php endif; ?>
       </table>
     </div>

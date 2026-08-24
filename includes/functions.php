@@ -109,3 +109,36 @@ function item_fields(string $slug): array {
 
     return $common;
 }
+
+/* ------------------------------ COUPONS ------------------------------ */
+
+/**
+ * Look up a coupon and check it can still be used.
+ * Returns ['ok'=>bool, 'error'=>string, 'coupon'=>array|null].
+ */
+function coupon_lookup($db, string $code): array {
+    $code = strtoupper(trim($code));
+    if ($code === '') return ['ok' => false, 'error' => 'Enter a coupon code.', 'coupon' => null];
+
+    $stmt = $db->prepare("SELECT * FROM coupons WHERE code = ?");
+    $stmt->execute([$code]);
+    $c = $stmt->fetch();
+
+    if (!$c)                                   return ['ok' => false, 'error' => 'That coupon code is not valid.', 'coupon' => null];
+    if (!$c['active'] || $c['active'] === 'f') return ['ok' => false, 'error' => 'This coupon is no longer active.', 'coupon' => null];
+
+    if (!empty($c['expires_at']) && strtotime($c['expires_at']) < time()) {
+        return ['ok' => false, 'error' => 'This coupon has expired.', 'coupon' => null];
+    }
+    if ($c['max_uses'] !== null && $c['max_uses'] !== '' && (int)$c['used_count'] >= (int)$c['max_uses']) {
+        return ['ok' => false, 'error' => 'This coupon has reached its usage limit.', 'coupon' => null];
+    }
+
+    return ['ok' => true, 'error' => '', 'coupon' => $c];
+}
+
+/** Discount in rupees for a given amount, rounded down, never the full price. */
+function coupon_discount(int $amount, int $percentOff): int {
+    $off = (int)floor($amount * $percentOff / 100);
+    return max(0, min($off, $amount - 1)); // always leave at least ₹1 to charge
+}

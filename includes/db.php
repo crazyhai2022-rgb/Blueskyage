@@ -192,6 +192,24 @@ class SupabaseStatement {
             $all = $this->db->request('GET', 'orders?select=id&invoice_no=not.is.null');
             $this->rows = [['c' => count($all)]];
 
+        } elseif (preg_match('/^SELECT \* FROM coupons WHERE code = \?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'coupons?select=*&code=eq.' . rawurlencode($params[0]));
+
+        } elseif (preg_match('/^UPDATE coupons SET used_count = used_count \+ 1 WHERE id = \?$/i', $sql)) {
+            $cur = $this->db->request('GET', 'coupons?select=used_count&id=eq.' . (int)$params[0]);
+            $n = (int)($cur[0]['used_count'] ?? 0) + 1;
+            $this->db->request('PATCH', 'coupons?id=eq.' . (int)$params[0], ['used_count' => $n]);
+
+        } elseif (preg_match("/^INSERT INTO orders \(user_id, plan, amount, bm_id, business_name, status, coupon_code, discount, original_amount\) VALUES \(\?, \?, \?, \?, \?, 'pending_payment', \?, \?, \?\)\$/i", $sql)) {
+            $res = $this->db->request('POST', 'orders', [
+                'user_id' => (int)$params[0], 'plan' => $params[1], 'amount' => (int)$params[2],
+                'bm_id' => $params[3], 'business_name' => $params[4], 'status' => 'pending_payment',
+                'coupon_code' => $params[5] ?: null,
+                'discount' => (int)$params[6],
+                'original_amount' => (int)$params[7],
+            ]);
+            $this->db->lastInsertIdValue = $res[0]['id'] ?? null;
+
         } elseif (preg_match('/^SELECT COUNT\(\*\) c FROM users$/i', $sql)) {
             $all = $this->db->request('GET', 'users?select=id');
             $this->rows = [['c' => count($all)]];
