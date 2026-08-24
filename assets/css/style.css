@@ -927,3 +927,69 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 .section-head-center { text-align: center; margin-left: auto; margin-right: auto; }
 .section-head-center .eyebrow { justify-content: center; }
 .section-head-center .section-sub { margin-left: auto; margin-right: auto; }
+/* ============================================================
+   SIGN-UP / LOGIN MONKEY MASCOT
+============================================================ */
+.monkey{ width:116px; height:110px; margin:0 auto 6px; position:relative; }
+.monkey-face{ position:relative; width:100%; height:100%; }
+.m-head{
+     position:absolute; left:14px; right:14px; top:20px; bottom:6px;
+     border-radius:50%;
+     background:linear-gradient(160deg,#f3cd9d,#e0a86a);
+     box-shadow:0 14px 28px rgba(6,8,20,.45), inset 0 -6px 14px rgba(150,90,40,.25);
+}
+.m-ear{
+     position:absolute; top:10px; width:32px; height:32px; border-radius:50%;
+     background:linear-gradient(160deg,#f3cd9d,#e0a86a);
+     box-shadow:0 8px 16px rgba(6,8,20,.35);
+}
+.m-ear-l{ left:-2px; }
+.m-ear-r{ right:-2px; }
+.m-eye{
+     position:absolute; top:30px; width:16px; height:16px; border-radius:50%;
+     background:#fff8ef; overflow:hidden;
+     box-shadow:inset 0 2px 4px rgba(0,0,0,.15);
+     transition:opacity .2s ease;
+}
+.m-eye-l{ left:15px; }
+.m-eye-r{ right:15px; }
+.m-pupil{
+     position:absolute; top:5px; left:5px; width:6px; height:6px; border-radius:50%;
+     background:#2b2035; transition:transform .15s ease;
+}
+.m-muzzle{
+     position:absolute; left:50%; bottom:4px; transform:translateX(-50%);
+     width:50px; height:30px; border-radius:50% 50% 45% 45% / 60% 60% 40% 40%;
+     background:linear-gradient(160deg,#f9e0bb,#eecb9a);
+}
+.m-nose{ position:absolute; bottom:13px; width:5px; height:7px; border-radius:50%; background:#8a5a3a; }
+.m-nose-l{ left:13px; }
+.m-nose-r{ right:13px; }
+.m-mouth{
+     position:absolute; left:50%; bottom:4px; transform:translateX(-50%);
+     width:16px; height:6px; border-bottom:2px solid #8a5a3a; border-radius:0 0 12px 12px;
+}
+.m-hand{
+     position:absolute; top:40px; width:26px; height:26px; border-radius:50%;
+     background:linear-gradient(160deg,#f3cd9d,#e0a86a);
+     box-shadow:0 8px 18px rgba(6,8,20,.4);
+     opacity:0; transform:translateY(14px) scale(.5);
+     transition:opacity .3s var(--ease), transform .3s var(--ease);
+     pointer-events:none;
+}
+.m-hand-l{ left:8px; }
+.m-hand-r{ right:8px; }
+.monkey.covering .m-hand{ opacity:1; transform:translateY(0) scale(1); }
+.monkey.covering .m-eye{ opacity:0; }
+.monkey.waving .m-hand-r{
+     opacity:1; transform-origin:70% 25%;
+     animation:monkeyWave .5s ease-in-out 3;
+}
+@keyframes monkeyWave{
+     0%,100%{ transform:translateY(0) rotate(0deg) scale(1); }
+     50%{ transform:translateY(-16px) rotate(22deg) scale(1); }
+}
+.monkey-say{
+     margin-top:8px; text-align:center; font-size:14.5px; font-weight:500;
+     color:var(--blue-light); min-height:20px;
+}
