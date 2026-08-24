@@ -221,8 +221,7 @@ input,textarea,select{ font-family:inherit; }
   }
   .nav-links.open{ transform:translateY(0) scale(1); opacity:1; visibility:visible; }
   .nav-toggle{ display:flex; }
-  .nav-cta .btn-ghost{ display:none; }
-}
+  }
 
 /* ============================================================
    BUTTONS
