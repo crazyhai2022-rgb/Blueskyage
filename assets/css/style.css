@@ -287,7 +287,7 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
    HERO
    ============================================================ */
 .hero{
-  position:relative; padding:118px 0 10px; overflow:hidden;
+  position:relative; padding:104px 0 6px; overflow:hidden;
   display:flex; align-items:center; min-height:auto;
 }
 .hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:60px; align-items:center; }
@@ -298,29 +298,29 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
 }
 .hero-tag .dot{ width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,var(--blue),var(--blue-light)); display:flex; align-items:center; justify-content:center; font-size:11px; }
 .hero h1{
-  font-size:clamp(29px,3.5vw,44px); font-weight:600; letter-spacing:-.015em;
-  line-height:1.14; margin-bottom:18px;
+  font-size:clamp(25px,2.9vw,37px); font-weight:600; letter-spacing:-.015em;
+  line-height:1.16; margin-bottom:16px;
 }
 .hero h1 em{
   font-style:normal;
   background:linear-gradient(100deg, var(--blue-light), var(--blue) 60%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-.hero p{ font-size:18px; color:var(--mist); max-width:520px; margin-bottom:38px; line-height:1.7; }
+.hero p{ max-width:520px; font-size:18px; color:var(--mist); max-width:520px; margin-bottom:38px; line-height:1.7; }
 .hero-actions{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:48px; }
 .hero-stats{ display:flex; gap:38px; flex-wrap:wrap; }
 .hero-stats div b{ display:block; font-family:var(--font-display); font-size:26px; color:var(--white); }
 .hero-stats div span{ font-size:13px; color:var(--mist-dim); }
 
-.hero-visual{ position:relative; display:flex; align-items:center; justify-content:center; height:100%; min-height:250px; }
+.hero-visual{ position:relative; display:flex; align-items:center; justify-content:center; height:100%; min-height:210px; }
 .hero-orb{
-  position:absolute; width:230px; height:230px; border-radius:50%;
+  position:absolute; width:190px; height:190px; border-radius:50%;
   background:radial-gradient(circle at 35% 30%, rgba(124,152,255,.5), rgba(59,98,255,.08) 60%, transparent 70%);
   filter:blur(6px); animation:orbFloat 6s ease-in-out infinite;
 }
 @keyframes orbFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-18px);} }
 .hero-mark{
-  position:relative; width:150px; height:150px; border-radius:28px;
+  position:relative; width:122px; height:122px; border-radius:24px;
   display:flex; align-items:center; justify-content:center;
   background:linear-gradient(150deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
   border:1px solid var(--glass-border-strong);
@@ -329,22 +329,22 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
   animation:markFloat 5s ease-in-out infinite;
 }
 @keyframes markFloat{ 0%,100%{ transform:translateY(0) rotate(0deg);} 50%{ transform:translateY(-14px) rotate(-1.5deg);} }
-.hero-mark img{ width:70px; filter:drop-shadow(0 10px 30px rgba(59,98,255,.5)); }
+.hero-mark img{ width:58px; filter:drop-shadow(0 10px 30px rgba(59,98,255,.5)); }
 .hero-ring{
   position:absolute; border:1px solid var(--glass-border); border-radius:50%;
 }
-.ring1{ width:196px; height:196px; animation:spin 30s linear infinite; }
-.ring2{ width:244px; height:244px; border-style:dashed; opacity:.4; animation:spin 50s linear infinite reverse; }
+.ring1{ width:160px; height:160px; animation:spin 30s linear infinite; }
+.ring2{ width:200px; height:200px; border-style:dashed; opacity:.4; animation:spin 50s linear infinite reverse; }
 
 @media(max-width:960px){
   .hero-grid{ grid-template-columns:1fr; }
-  .hero{ padding:160px 0 80px; min-height:auto; }
-  .hero-visual{ min-height:200px; order:-1; }
-  .hero-mark{ width:140px; height:140px; border-radius:26px; }
-  .hero-mark img{ width:64px; }
-  .hero-orb{ width:210px; height:210px; }
-  .ring1{ width:180px; height:180px; }
-  .ring2{ width:225px; height:225px; }
+  .hero{ padding:104px 0 14px; min-height:auto; }
+  .hero-visual{ min-height:168px; order:-1; }
+  .hero-mark{ width:108px; height:108px; border-radius:20px; }
+  .hero-mark img{ width:50px; }
+  .hero-orb{ width:165px; height:165px; }
+  .ring1{ width:140px; height:140px; }
+  .ring2{ width:175px; height:175px; }
 }
 
 /* ============================================================
@@ -508,20 +508,6 @@ footer{ border-top:1px solid var(--line); padding:70px 0 30px; margin-top:60px; 
 
 @media(max-width:820px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
 @media(max-width:520px){ .footer-grid{ grid-template-columns:1fr; } }
-
-/* ============================================================
-   WHATSAPP FLOAT
-   ============================================================ */
-.wa-float{
-  position:fixed; bottom:26px; right:26px; z-index:900;
-  width:58px; height:58px; border-radius:50%;
-  background:linear-gradient(135deg,#25D366,#1aa952);
-  display:flex; align-items:center; justify-content:center;
-  box-shadow:0 10px 30px rgba(37,211,102,.4);
-  animation:waPulse 2.6s ease-in-out infinite;
-}
-.wa-float svg{ width:28px; height:28px; color:#04150a; }
-@keyframes waPulse{ 0%,100%{ box-shadow:0 10px 30px rgba(37,211,102,.4);} 50%{ box-shadow:0 10px 40px rgba(37,211,102,.65),0 0 0 10px rgba(37,211,102,.08);} }
 
 /* ============================================================
    PAGE HEADER (inner pages)
