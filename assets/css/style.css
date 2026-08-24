@@ -268,7 +268,8 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
 }
 .eyebrow::before{ content:''; width:20px; height:1px; background:var(--blue-light); }
 
-.section{ padding:120px 0; position:relative; }
+.section{ padding:80px 0; position:relative; }
+#plans{ padding-top:34px; }
 .section-head{ max-width:640px; margin-bottom:60px; }
 .section-head.center{ margin-left:auto; margin-right:auto; text-align:center; }
 .section-title{ font-size:clamp(30px,4vw,44px); line-height:1.12; margin-bottom:16px; }
@@ -286,7 +287,7 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
    HERO
    ============================================================ */
 .hero{
-  position:relative; padding:120px 0 46px; overflow:hidden;
+  position:relative; padding:118px 0 10px; overflow:hidden;
   display:flex; align-items:center; min-height:auto;
 }
 .hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:60px; align-items:center; }
@@ -311,15 +312,15 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
 .hero-stats div b{ display:block; font-family:var(--font-display); font-size:26px; color:var(--white); }
 .hero-stats div span{ font-size:13px; color:var(--mist-dim); }
 
-.hero-visual{ position:relative; display:flex; align-items:center; justify-content:center; height:100%; min-height:330px; }
+.hero-visual{ position:relative; display:flex; align-items:center; justify-content:center; height:100%; min-height:250px; }
 .hero-orb{
-  position:absolute; width:300px; height:300px; border-radius:50%;
+  position:absolute; width:230px; height:230px; border-radius:50%;
   background:radial-gradient(circle at 35% 30%, rgba(124,152,255,.5), rgba(59,98,255,.08) 60%, transparent 70%);
   filter:blur(6px); animation:orbFloat 6s ease-in-out infinite;
 }
 @keyframes orbFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-18px);} }
 .hero-mark{
-  position:relative; width:190px; height:190px; border-radius:34px;
+  position:relative; width:150px; height:150px; border-radius:28px;
   display:flex; align-items:center; justify-content:center;
   background:linear-gradient(150deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
   border:1px solid var(--glass-border-strong);
@@ -328,12 +329,12 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
   animation:markFloat 5s ease-in-out infinite;
 }
 @keyframes markFloat{ 0%,100%{ transform:translateY(0) rotate(0deg);} 50%{ transform:translateY(-14px) rotate(-1.5deg);} }
-.hero-mark img{ width:88px; filter:drop-shadow(0 10px 30px rgba(59,98,255,.5)); }
+.hero-mark img{ width:70px; filter:drop-shadow(0 10px 30px rgba(59,98,255,.5)); }
 .hero-ring{
   position:absolute; border:1px solid var(--glass-border); border-radius:50%;
 }
-.ring1{ width:252px; height:252px; animation:spin 30s linear infinite; }
-.ring2{ width:312px; height:312px; border-style:dashed; opacity:.4; animation:spin 50s linear infinite reverse; }
+.ring1{ width:196px; height:196px; animation:spin 30s linear infinite; }
+.ring2{ width:244px; height:244px; border-style:dashed; opacity:.4; animation:spin 50s linear infinite reverse; }
 
 @media(max-width:960px){
   .hero-grid{ grid-template-columns:1fr; }
@@ -936,3 +937,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 }
 .footer-legal-row a { color: var(--mist-dim); font-size: 13px; text-decoration: none; }
 .footer-legal-row a:hover { color: var(--blue-light); }
+
+/* centred section heading (used on the homepage pricing block) */
+.section-head-center { text-align: center; margin-left: auto; margin-right: auto; }
+.section-head-center .eyebrow { justify-content: center; }
+.section-head-center .section-sub { margin-left: auto; margin-right: auto; }
