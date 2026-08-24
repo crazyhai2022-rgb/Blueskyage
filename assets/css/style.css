@@ -1071,3 +1071,8 @@ textarea:focus { outline: none; border-color: rgba(120,150,255,.55); }
 /* browsers add their own reveal control — two would be confusing */
 .pw-field input::-ms-reveal,
 .pw-field input::-ms-clear { display: none; }
+
+/* ==================== CHECKOUT -- RAZORPAY TRUST BADGE ==================== */
+.ck-badge { display: flex; justify-content: center; margin-top: 14px; }
+.ck-badge img { height: 30px; width: auto; opacity: .85; transition: opacity .2s ease; }
+.ck-badge:hover img { opacity: 1; }
