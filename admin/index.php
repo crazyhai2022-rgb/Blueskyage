@@ -86,7 +86,25 @@ foreach ($stats as $s) {
           <td><?= e($o['user_name']) ?><br><span style="color:var(--mist-dim);font-size:11.5px;"><?= e($o['phone']) ?></span></td>
           <td><?= e($o['plan']) ?></td>
           <td>₹<?= (int)$o['amount'] ?></td>
-          <td><?= e($o['bm_id'] ?: '—') ?></td>
+          <td>
+          <?= e($o['bm_id'] ?: '—') ?>
+          <?php
+            $det = json_decode($o['details'] ?? '', true);
+            if (!is_array($det)) $det = [];
+            unset($det['bmid']);
+          ?>
+          <?php if ($det): ?>
+            <details class="admin-details">
+              <summary>details</summary>
+              <?php foreach ($det as $k => $v): ?>
+                <div><span><?= e(ucwords(str_replace('_', ' ', $k))) ?>:</span> <?= e($v) ?></div>
+              <?php endforeach; ?>
+            </details>
+          <?php endif; ?>
+          <?php if (!empty($o['coupon_code'])): ?>
+            <div class="admin-coupon"><?= e($o['coupon_code']) ?> −₹<?= number_format((int)$o['discount']) ?></div>
+          <?php endif; ?>
+        </td>
           <td><?= e($o['slot_id'] ?: '—') ?></td>
           <td><span class="<?= status_class($o['status']) ?>"><?= status_label($o['status']) ?></span></td>
           <td>

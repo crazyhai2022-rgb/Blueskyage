@@ -170,6 +170,24 @@ class SupabaseStatement {
             $this->rows = $this->db->request('GET', 'orders?select=*&razorpay_order_id=eq.'
                 . rawurlencode($params[0]) . '&user_id=eq.' . (int)$params[1]);
 
+        } elseif (preg_match("/^INSERT INTO orders \\(user_id, plan, amount, bm_id, business_name, status, details, coupon_code, discount, original_amount\\) VALUES \\(\\?, \\?, \\?, \\?, \\?, 'pending_payment', \\?, \\?, \\?, \\?\\)\$/i", $sql)) {
+            $res = $this->db->request('POST', 'orders', [
+                'user_id' => (int)$params[0], 'plan' => $params[1], 'amount' => (int)$params[2],
+                'bm_id' => $params[3], 'business_name' => $params[4], 'status' => 'pending_payment',
+                'details' => $params[5], 'coupon_code' => $params[6],
+                'discount' => (int)$params[7], 'original_amount' => (int)$params[8],
+            ]);
+            $this->db->lastInsertIdValue = $res[0]['id'] ?? null;
+
+        } elseif (preg_match('/^SELECT \\* FROM coupons WHERE code = \\?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'coupons?select=*&code=eq.' . rawurlencode($params[0]));
+
+        } elseif (preg_match('/^SELECT used_count FROM coupons WHERE code = \\?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'coupons?select=used_count&code=eq.' . rawurlencode($params[0]));
+
+        } elseif (preg_match('/^UPDATE coupons SET used_count = \\? WHERE code = \\?$/i', $sql)) {
+            $this->db->request('PATCH', 'coupons?code=eq.' . rawurlencode($params[1]), ['used_count' => (int)$params[0]]);
+
         } elseif (preg_match('/^SELECT COUNT\\(\\*\\) AS c FROM orders WHERE invoice_no IS NOT NULL$/i', $sql)) {
             $all = $this->db->request('GET', 'orders?select=id&invoice_no=not.is.null');
             $this->rows = [['c' => count($all)]];

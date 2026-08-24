@@ -55,3 +55,57 @@ function plan_amount(string $plan): int {
     $item = catalog_item($plan);
     return $item ? $item['amount'] : 1499;
 }
+
+/**
+ * What we need to ask the buyer, per catalog item. Each field is
+ * [name, label, placeholder, required]. Kept server-side so the form and
+ * the saved order can never drift apart.
+ */
+function item_fields(string $slug): array {
+    $common = [
+        ['business', 'Business / Brand Name', 'Your business name', true],
+    ];
+
+    switch (strtolower(trim($slug))) {
+        case 'basic':
+        case 'pro':
+            return [
+                ['bmid', 'Business Portfolio ID (BM ID)', 'e.g. 123456789012345', true],
+                ['business', 'Business Name', 'Your business name', true],
+                ['website', 'Website or Page Link', 'https://…', false],
+                ['spend', 'Expected Monthly Ad Spend', 'e.g. $500 - $2000', false],
+            ];
+
+        case 'facebook-page':
+            return array_merge($common, [
+                ['page_name', 'Page Name You Want', 'Exact name for the page', true],
+                ['category', 'Page Category', 'e.g. Clothing Brand, Local Business', true],
+            ]);
+
+        case 'name-change-page':
+            return array_merge($common, [
+                ['page_name', 'Desired Page Name', 'Name you want on the page', true],
+                ['category', 'Page Category', 'e.g. E-commerce, Services', false],
+            ]);
+
+        case 'old-profile':
+            return array_merge($common, [
+                ['region', 'Preferred Country / Region', 'e.g. USA, India, any', false],
+                ['purpose', 'What will you use it for?', 'e.g. running ads, managing a BM', true],
+            ]);
+
+        case 'verified-profile':
+            return array_merge($common, [
+                ['region', 'Preferred Country / Region', 'e.g. USA, India, any', false],
+                ['purpose', 'What will you use it for?', 'e.g. BM verification, ad account', true],
+            ]);
+
+        case 'instagram-account':
+            return array_merge($common, [
+                ['username', 'Preferred Username', '@yourbrand', false],
+                ['niche', 'Account Niche', 'e.g. fashion, fitness, food', true],
+            ]);
+    }
+
+    return $common;
+}

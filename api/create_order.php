@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
-require_once __DIR__ . '/../includes/cart.php';
+require_once __DIR__ . '/../includes/coupons.php';
 
 header('Content-Type: application/json');
 
@@ -12,43 +12,62 @@ if (!$user) {
     exit;
 }
 
-$input    = json_decode(file_get_contents('php://input'), true) ?: [];
-$bmid     = trim($input['bmid'] ?? '');
-$business = trim($input['business'] ?? '');
+$input = json_decode(file_get_contents('php://input'), true) ?: [];
 
-// Prices come from the session cart expanded against the server-side catalog,
-// so nothing the browser sends can change what is charged.
-$items = cart_items();
-if (!$items) {
-    echo json_encode(['ok' => false, 'error' => 'Your cart is empty.']);
+// Price always comes from the server-side catalog, never from the browser.
+$item = catalog_item($input['plan'] ?? '');
+if (!$item) {
+    echo json_encode(['ok' => false, 'error' => 'Unknown plan or product.']);
     exit;
 }
-$total = cart_total();
+
+$slug     = strtolower(trim($input['plan']));
+$original = (int)$item['amount'];
+$amount   = $original;
+$discount = 0;
+$couponCode = null;
+
+// Re-check the coupon here — the browser's number is never trusted.
+if (!empty($input['coupon'])) {
+    $check = coupon_lookup($input['coupon']);
+    if ($check['ok']) {
+        $applied    = coupon_apply($original, $check['coupon']);
+        $amount     = $applied['final'];
+        $discount   = $applied['discount'];
+        $couponCode = strtoupper(trim($input['coupon']));
+    }
+}
+
+// Keep only the fields this item actually asks for, plus free-text notes.
+$allowed = array_column(item_fields($slug), 0);
+$allowed[] = 'notes';
+$posted  = is_array($input['details'] ?? null) ? $input['details'] : [];
+
+$details = [];
+foreach ($allowed as $key) {
+    // mb_* isn't guaranteed on shared hosting, so fall back to substr.
+    if (!empty($posted[$key])) {
+        $val = trim((string)$posted[$key]);
+        $details[$key] = function_exists('mb_substr') ? mb_substr($val, 0, 500) : substr($val, 0, 500);
+    }
+}
+
+$bmid     = $details['bmid'] ?? '';
+$business = $details['business'] ?? '';
 
 $db = get_db();
 
-// One row per cart line, tied together by a shared group id so a single
-// payment can settle the whole cart.
-$groupId  = 'G' . date('ymdHis') . random_int(100, 999);
-$orderIds = [];
+$stmt = $db->prepare(
+    "INSERT INTO orders (user_id, plan, amount, bm_id, business_name, status, details, coupon_code, discount, original_amount)
+     VALUES (?, ?, ?, ?, ?, 'pending_payment', ?, ?, ?, ?)"
+);
+$stmt->execute([
+    $user['id'], $item['name'], $amount, $bmid, $business,
+    json_encode($details, JSON_UNESCAPED_UNICODE), $couponCode, $discount, $original,
+]);
+$orderId = (int)$db->lastInsertId();
 
-foreach ($items as $i) {
-    $stmt = $db->prepare(
-        "INSERT INTO orders (user_id, plan, amount, bm_id, business_name, status, razorpay_order_id)
-         VALUES (?, ?, ?, ?, ?, 'pending_payment', ?)"
-    );
-    $stmt->execute([
-        $user['id'],
-        $i['qty'] > 1 ? $i['name'] . ' × ' . $i['qty'] : $i['name'],
-        $i['subtotal'],
-        $i['recurring'] ? $bmid : '',
-        $business,
-        $groupId,
-    ]);
-    $orderIds[] = (int)$db->lastInsertId();
-}
-
-// Ask Razorpay for a payment order — skipped cleanly when keys aren't set yet.
+// Ask Razorpay for a payment order — skipped cleanly when keys aren't set.
 $razorpayOrderId = null;
 $keysReady = defined('RAZORPAY_KEY_ID') && RAZORPAY_KEY_ID !== 'YOUR_RAZORPAY_KEY_ID' && RAZORPAY_KEY_ID !== '';
 
@@ -62,10 +81,10 @@ if (function_exists('curl_init') && $keysReady) {
         CURLOPT_USERPWD        => RAZORPAY_KEY_ID . ':' . RAZORPAY_KEY_SECRET,
         CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
         CURLOPT_POSTFIELDS     => json_encode([
-            'amount'   => $total * 100, // paise
+            'amount'   => $amount * 100, // paise
             'currency' => 'INR',
-            'receipt'  => $groupId,
-            'notes'    => ['group_id' => $groupId, 'user_id' => (string)$user['id']],
+            'receipt'  => 'order_' . $orderId,
+            'notes'    => ['order_id' => (string)$orderId, 'plan' => $item['name']],
         ]),
     ]);
     $response = curl_exec($ch);
@@ -75,16 +94,19 @@ if (function_exists('curl_init') && $keysReady) {
     if ($response !== false && $code < 400) {
         $decoded = json_decode($response, true);
         $razorpayOrderId = $decoded['id'] ?? null;
+        if ($razorpayOrderId) {
+            $db->prepare("UPDATE orders SET razorpay_order_id = ? WHERE id = ?")
+               ->execute([$razorpayOrderId, $orderId]);
+        }
     }
 }
 
-// Cart is now an order — empty it either way.
-cart_clear();
+if ($couponCode) coupon_mark_used($couponCode);
 
 echo json_encode([
     'ok'                => true,
-    'group_id'          => $groupId,
-    'order_ids'         => $orderIds,
+    'order_id'          => $orderId,
+    'amount'            => $amount,
     'razorpay_order_id' => $razorpayOrderId,
-    'razorpay_amount'   => $total * 100,
+    'razorpay_amount'   => $amount * 100,
 ]);

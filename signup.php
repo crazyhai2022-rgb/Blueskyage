@@ -62,7 +62,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <section class="section" style="padding-top:60px;">
   <div class="container app-wrap">
     <div class="eyebrow">Create Account</div>
-    <h1 style="margin-bottom:24px;">Sign Up</h1>
+    <h1 style="margin-bottom:20px;">Sign Up</h1>
+
+    <!-- Waves hello on arrival, covers its eyes while you type a password -->
+    <div class="monkey" id="monkey" aria-hidden="true">
+      <div class="monkey-face">
+        <div class="m-ear m-ear-l"></div>
+        <div class="m-ear m-ear-r"></div>
+        <div class="m-head">
+          <div class="m-eye m-eye-l"><span class="m-pupil"></span></div>
+          <div class="m-eye m-eye-r"><span class="m-pupil"></span></div>
+          <div class="m-muzzle">
+            <div class="m-nose m-nose-l"></div>
+            <div class="m-nose m-nose-r"></div>
+            <div class="m-mouth"></div>
+          </div>
+        </div>
+        <div class="m-hand m-hand-l"></div>
+        <div class="m-hand m-hand-r"></div>
+      </div>
+      <p class="monkey-say" id="monkeySay">Welcome! 👋</p>
+    </div>
 
     <div class="glass-card form-wrap">
       <?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
@@ -93,5 +113,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </section>
 
+
+<script>
+/* Monkey reacts to the form: hands over the eyes while a password is being
+   typed, a quick wave on arrival. Purely decorative. */
+(function () {
+  const monkey = document.getElementById('monkey');
+  const say    = document.getElementById('monkeySay');
+  if (!monkey || !say) return;
+
+  const pass = document.querySelector('input[type="password"]');
+  const name = document.getElementById('name');
+
+  monkey.classList.add('waving');
+  setTimeout(function () { monkey.classList.remove('waving'); }, 2200);
+
+  function greeting() {
+    const v = name && name.value.trim().split(' ')[0];
+    return v ? 'Hi ' + v + '! \uD83D\uDC4B' : 'Welcome! \uD83D\uDC4B';
+  }
+
+  function cover(on) {
+    // A wave in progress would otherwise animate over the covering pose.
+    if (on) monkey.classList.remove('waving');
+    monkey.classList.toggle('covering', on);
+    say.textContent = on ? "Not looking, promise! \uD83D\uDE48" : greeting();
+  }
+
+  if (pass) {
+    pass.addEventListener('focus', function () { cover(true); });
+    pass.addEventListener('blur',  function () { cover(false); });
+  }
+
+  if (name) {
+    name.addEventListener('input', function () {
+      if (!monkey.classList.contains('covering')) say.textContent = greeting();
+    });
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    if (monkey.classList.contains('covering')) return;
+    const r = monkey.getBoundingClientRect();
+    const dx = Math.max(-3, Math.min(3, (e.clientX - (r.left + r.width / 2)) / 55));
+    const dy = Math.max(-3, Math.min(3, (e.clientY - (r.top + r.height / 2)) / 55));
+    monkey.querySelectorAll('.m-pupil').forEach(function (pu) {
+      pu.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+    });
+  });
+})();
+</script>
 </body>
 </html>

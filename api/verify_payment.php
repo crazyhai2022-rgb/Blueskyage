@@ -12,12 +12,12 @@ if (!$user) {
 }
 
 $input     = json_decode(file_get_contents('php://input'), true) ?: [];
-$groupId   = $input['group_id'] ?? '';
+$orderId   = (int)($input['order_id'] ?? 0);
 $rzpOrder  = $input['razorpay_order_id'] ?? '';
 $rzpPay    = $input['razorpay_payment_id'] ?? '';
 $signature = $input['razorpay_signature'] ?? '';
 
-if (!$groupId || !$rzpOrder || !$rzpPay || !$signature) {
+if (!$orderId || !$rzpOrder || !$rzpPay || !$signature) {
     echo json_encode(['ok' => false, 'error' => 'Incomplete payment details.']);
     exit;
 }
@@ -32,8 +32,8 @@ if (!hash_equals($expected, $signature)) {
 $db = get_db();
 
 // Only mark rows that belong to this user and this checkout group.
-$stmt = $db->prepare("SELECT * FROM orders WHERE razorpay_order_id = ? AND user_id = ?");
-$stmt->execute([$groupId, $user['id']]);
+$stmt = $db->prepare("SELECT * FROM orders WHERE id = ? AND user_id = ?");
+$stmt->execute([$orderId, $user['id']]);
 $orders = $stmt->fetchAll();
 
 if (!$orders) {

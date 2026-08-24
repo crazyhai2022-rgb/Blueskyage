@@ -66,14 +66,15 @@ $justPlaced = isset($_GET['placed']);
         <div class="order-card">
           <div class="order-card-top">
             <div>
-              <h3><?= e($o['plan']) ?> Plan — ₹<?= (int)$o['amount'] ?>/mo</h3>
+              <?php $isPlan = stripos($o['plan'], 'Plan') !== false; ?>
+              <h3><?= e($o['plan']) ?> — ₹<?= number_format((int)$o['amount']) ?><?= $isPlan ? '/mo' : '' ?></h3>
               <span><?= $o['invoice_no'] ? e($o['invoice_no']) : 'Order #' . (int)$o['id'] ?> · <?= date('d M Y', strtotime($o['created_at'])) ?></span>
             </div>
             <span class="<?= status_class($o['status']) ?>"><?= status_label($o['status']) ?></span>
           </div>
 
           <?php if ($o['status'] === 'pending_payment'): ?>
-            <p style="font-size:13px;color:var(--mist);">Payment not completed. <a href="checkout.php?plan=<?= urlencode($o['plan']) ?>" style="color:var(--blue-light);">Try again</a></p>
+            <p style="font-size:13px;color:var(--mist);">Payment not completed. <a href="services.html" style="color:var(--blue-light);">Try again</a></p>
           <?php elseif ($o['status'] === 'paid_preparing'): ?>
             <p style="font-size:13px;color:var(--mist);">Your payment is confirmed — our team is setting up your ad account. This usually takes a few hours.</p>
           <?php elseif ($o['status'] === 'active'): ?>
@@ -84,6 +85,26 @@ $justPlaced = isset($_GET['placed']);
             </div>
           <?php elseif ($o['status'] === 'cancelled'): ?>
             <p style="font-size:13px;color:var(--mist);">This order was cancelled.</p>
+          <?php endif; ?>
+
+          <?php if (!empty($o['coupon_code'])): ?>
+            <p class="order-coupon">Coupon <b><?= e($o['coupon_code']) ?></b> applied — you saved ₹<?= number_format((int)$o['discount']) ?></p>
+          <?php endif; ?>
+
+          <?php
+            $det = json_decode($o['details'] ?? '', true);
+            if (!is_array($det)) $det = [];
+            unset($det['business'], $det['bmid']);
+          ?>
+          <?php if ($det): ?>
+            <details class="order-more">
+              <summary>Details you submitted</summary>
+              <div class="order-detail-grid">
+                <?php foreach ($det as $k => $v): ?>
+                  <div><span><?= e(ucwords(str_replace('_', ' ', $k))) ?></span><b><?= e($v) ?></b></div>
+                <?php endforeach; ?>
+              </div>
+            </details>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>
