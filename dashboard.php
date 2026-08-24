@@ -26,16 +26,16 @@ $justPlaced = isset($_GET['placed']);
 
 <header class="navbar scrolled">
   <div class="container nav-inner">
-    <a href="index.html" class="brand">
+    <a href="/" class="brand">
       <img src="assets/img/logo-mark.png" alt="BlueSky Agency">
       <span class="brand-word">BLUE<b>SKY</b></span>
     </a>
     <nav class="nav-links">
-      <a href="services.html">Plans</a>
-      <a href="contact.html">Contact</a>
+      <a href="/services">Plans</a>
+      <a href="/contact">Contact</a>
     </nav>
     <div class="nav-cta">
-      <a href="logout.php" class="btn btn-ghost btn-sm">Log Out</a>
+      <a href="/logout" class="btn btn-ghost btn-sm">Log Out</a>
     </div>
   </div>
 </header>
@@ -59,7 +59,7 @@ $justPlaced = isset($_GET['placed']);
     <?php if (!$orders): ?>
       <div class="glass-card" style="text-align:center;padding:50px 30px;">
         <p style="color:var(--mist);margin-bottom:20px;">You don't have any orders yet.</p>
-        <a href="services.html" class="btn btn-primary">View Plans</a>
+        <a href="/services" class="btn btn-primary">View Plans</a>
       </div>
     <?php else: ?>
       <?php foreach ($orders as $o): ?>
@@ -74,7 +74,7 @@ $justPlaced = isset($_GET['placed']);
           </div>
 
           <?php if ($o['status'] === 'pending_payment'): ?>
-            <p style="font-size:13px;color:var(--mist);">Payment not completed. <a href="services.html" style="color:var(--blue-light);">Try again</a></p>
+            <p style="font-size:13px;color:var(--mist);">Payment not completed. <a href="/services" style="color:var(--blue-light);">Try again</a></p>
           <?php elseif ($o['status'] === 'paid_preparing'): ?>
             <p style="font-size:13px;color:var(--mist);">Your payment is confirmed — our team is setting up your ad account. This usually takes a few hours.</p>
           <?php elseif ($o['status'] === 'active'): ?>

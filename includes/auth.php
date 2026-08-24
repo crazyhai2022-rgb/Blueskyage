@@ -19,7 +19,7 @@ function require_login(): array {
     $u = current_user();
     if (!$u) {
         $current = $_SERVER['REQUEST_URI'] ?? 'dashboard.php';
-        header('Location: login.php?redirect=' . urlencode($current));
+        header('Location: /login?redirect=' . urlencode($current));
         exit;
     }
     return $u;
@@ -48,7 +48,7 @@ function current_admin(): ?array {
 function require_admin(): array {
     $a = current_admin();
     if (!$a) {
-        header('Location: login.php');
+        header('Location: /admin/login');
         exit;
     }
     return $a;

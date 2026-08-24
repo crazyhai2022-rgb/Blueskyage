@@ -15,5 +15,5 @@ if (!in_array($status, $allowed, true)) $status = 'pending_payment';
 $stmt = get_db()->prepare("UPDATE orders SET slot_id = ?, ad_account_id = ?, status = ? WHERE id = ?");
 $stmt->execute([$slotId ?: null, $adAccountId ?: null, $status, $orderId]);
 
-header('Location: index.php');
+header('Location: /admin');
 exit;

@@ -43,13 +43,13 @@ foreach ($stats as $s) {
 
 <header class="navbar scrolled">
   <div class="container nav-inner">
-    <a href="index.php" class="brand">
+    <a href="/admin" class="brand">
       <img src="../assets/img/logo-mark.png" alt="BlueSky Agency">
       <span class="brand-word">BLUE<b>SKY</b></span>
     </a>
     <div class="nav-cta">
       <span class="who" style="margin-right:14px;">Admin: <b><?= e($admin['username']) ?></b></span>
-      <a href="logout.php" class="btn btn-ghost btn-sm">Log Out</a>
+      <a href="/logout" class="btn btn-ghost btn-sm">Log Out</a>
     </div>
   </div>
 </header>
@@ -109,7 +109,7 @@ foreach ($stats as $s) {
           <td><?= e($o['slot_id'] ?: '—') ?></td>
           <td><span class="<?= status_class($o['status']) ?>"><?= status_label($o['status']) ?></span></td>
           <td>
-            <form class="inline-form" method="post" action="update_order.php">
+            <form class="inline-form" method="post" action="/admin/update-order">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="order_id" value="<?= (int)$o['id'] ?>">
               <input type="text" name="slot_id" placeholder="Slot (A7)" value="<?= e($o['slot_id'] ?? '') ?>" style="width:80px;">

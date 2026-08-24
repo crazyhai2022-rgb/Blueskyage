@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 $slug = strtolower(trim($_GET['plan'] ?? ''));
 $item = catalog_item($slug);
-if (!$item) { header('Location: services.html'); exit; }
+if (!$item) { header('Location: /services'); exit; }
 
 // Send guests to log in first, then straight back here.
 $user = require_login();
@@ -32,13 +32,13 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
 
 <header class="navbar scrolled ck-nav">
   <div class="container nav-inner">
-    <a href="index.html" class="brand">
+    <a href="/" class="brand">
       <img src="assets/img/logo-mark.png" alt="BlueSky Agency">
       <span class="brand-word">BLUE<b>SKY</b></span>
     </a>
     <div class="app-nav" style="margin:0;">
       <span class="who">Logged in as <b><?= e($user['name']) ?></b> &middot;
-        <a href="dashboard.php" style="color:var(--blue-light);">Dashboard</a></span>
+        <a href="/dashboard" style="color:var(--blue-light);">Dashboard</a></span>
     </div>
   </div>
 </header>
@@ -172,7 +172,7 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
           <p class="ck-foot">
             <?php if ($paymentsReady): ?>
               Secure payment via Razorpay. Your order shows up in your
-              <a href="dashboard.php">Dashboard</a> instantly.
+              <a href="/dashboard">Dashboard</a> instantly.
             <?php else: ?>
               Online payment isn't switched on yet &mdash; we'll confirm this order
               on WhatsApp and share payment details there.

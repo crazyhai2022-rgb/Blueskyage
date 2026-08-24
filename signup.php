@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 
-if (current_user()) { header('Location: dashboard.php'); exit; }
+if (current_user()) { header('Location: /dashboard'); exit; }
 
 $error = '';
 $name = $email = $phone = '';
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <header class="navbar scrolled">
   <div class="container nav-inner">
-    <a href="index.html" class="brand">
+    <a href="/" class="brand">
       <img src="assets/img/logo-mark.png" alt="BlueSky Agency">
       <span class="brand-word">BLUE<b>SKY</b></span>
     </a>
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="glass-card form-wrap">
       <?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
-      <form method="post" action="signup.php<?= isset($_GET['redirect']) ? '?redirect=' . urlencode($_GET['redirect']) : '' ?>">
+      <form method="post" action="/signup<?= isset($_GET['redirect']) ? '?redirect=' . urlencode($_GET['redirect']) : '' ?>">
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <div class="form-group">
           <label for="name">Full Name</label>
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </form>
       <?php require __DIR__ . '/includes/social_buttons.php'; ?>
       <p style="margin-top:18px;font-size:13.5px;color:var(--mist);text-align:center;">
-        Already have an account? <a href="login.php<?= isset($_GET['redirect']) ? '?redirect=' . urlencode($_GET['redirect']) : '' ?>" style="color:var(--blue-light);">Log In</a>
+        Already have an account? <a href="/login<?= isset($_GET['redirect']) ? '?redirect=' . urlencode($_GET['redirect']) : '' ?>" style="color:var(--blue-light);">Log In</a>
       </p>
     </div>
   </div>
