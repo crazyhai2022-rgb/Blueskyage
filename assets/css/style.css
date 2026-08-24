@@ -269,7 +269,7 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
 .eyebrow::before{ content:''; width:20px; height:1px; background:var(--blue-light); }
 
 .section{ padding:80px 0; position:relative; }
-#plans{ padding-top:34px; }
+#plans{ padding-top:12px; }
 .section-head{ max-width:640px; margin-bottom:60px; }
 .section-head.center{ margin-left:auto; margin-right:auto; text-align:center; }
 .section-title{ font-size:clamp(30px,4vw,44px); line-height:1.12; margin-bottom:16px; }
@@ -287,7 +287,7 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
    HERO
    ============================================================ */
 .hero{
-  position:relative; padding:104px 0 6px; overflow:hidden;
+  position:relative; padding:104px 0 0; overflow:hidden;
   display:flex; align-items:center; min-height:auto;
 }
 .hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:60px; align-items:center; }
@@ -338,7 +338,7 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-.
 
 @media(max-width:960px){
   .hero-grid{ grid-template-columns:1fr; }
-  .hero{ padding:104px 0 14px; min-height:auto; }
+  .hero{ padding:104px 0 0; min-height:auto; }
   .hero-visual{ min-height:168px; order:-1; }
   .hero-mark{ width:108px; height:108px; border-radius:20px; }
   .hero-mark img{ width:50px; }
