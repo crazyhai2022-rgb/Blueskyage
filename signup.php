@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
       </form>
+      <?php require __DIR__ . '/includes/social_buttons.php'; ?>
       <p style="margin-top:18px;font-size:13.5px;color:var(--mist);text-align:center;">
         Already have an account? <a href="login.php<?= isset($_GET['redirect']) ? '?redirect=' . urlencode($_GET['redirect']) : '' ?>" style="color:var(--blue-light);">Log In</a>
       </p>

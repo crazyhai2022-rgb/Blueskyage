@@ -192,6 +192,14 @@ class SupabaseStatement {
             $all = $this->db->request('GET', 'orders?select=id&invoice_no=not.is.null');
             $this->rows = [['c' => count($all)]];
 
+        } elseif (preg_match("/^INSERT INTO users \(name, email, phone, password_hash, provider, provider_id, avatar_url\) VALUES \(\?, \?, \?, NULL, \?, \?, \?\)\$/i", $sql)) {
+            $res = $this->db->request('POST', 'users', [
+                'name' => $params[0], 'email' => $params[1], 'phone' => $params[2],
+                'password_hash' => null, 'provider' => $params[3],
+                'provider_id' => $params[4], 'avatar_url' => $params[5],
+            ]);
+            $this->db->lastInsertIdValue = $res[0]['id'] ?? null;
+
         } elseif (preg_match('/^SELECT \* FROM coupons WHERE code = \?$/i', $sql)) {
             $this->rows = $this->db->request('GET', 'coupons?select=*&code=eq.' . rawurlencode($params[0]));
 
