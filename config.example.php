@@ -25,5 +25,5 @@ define('APP_SECRET', 'change-this-to-a-long-random-string-before-launch');
 date_default_timezone_set('Asia/Kolkata');
 
 /* Social sign-in — see config.php notes.
-   Supported values: 'google', 'twitter' (X), 'apple' */
+   Supported values: 'google' */
 define('SOCIAL_PROVIDERS', []);

@@ -173,3 +173,34 @@ Message: ${data.message || "-"}`;
     openWhatsApp(msg);
   });
 }
+
+// --- PASSWORD VISIBILITY TOGGLE --------------------------------------
+// Lets people check what they typed. The field returns to hidden on submit
+// so a password is never left on screen after leaving the page.
+(function () {
+  document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+    const field = btn.closest('.pw-field');
+    const input = field && field.querySelector('input');
+    if (!input) return;
+
+    const openEye = btn.querySelector('.pw-open');
+    const shutEye = btn.querySelector('.pw-shut');
+
+    function setShown(shown) {
+      input.type = shown ? 'text' : 'password';
+      openEye.hidden = shown;
+      shutEye.hidden = !shown;
+      const label = shown ? 'Hide password' : 'Show password';
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('title', label);
+    }
+
+    btn.addEventListener('click', function () {
+      setShown(input.type === 'password');
+      input.focus();
+    });
+
+    const form = input.closest('form');
+    if (form) form.addEventListener('submit', function () { setShown(false); });
+  });
+})();

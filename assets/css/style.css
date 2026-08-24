@@ -1022,6 +1022,7 @@ textarea:focus { outline: none; border-color: rgba(120,150,255,.55); }
 }
 
 .social-row { display: flex; gap: 9px; }
+.social-row:has(.social-btn:only-child) .social-btn { padding: 12px; }
 
 .social-btn {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1043,6 +1044,30 @@ textarea:focus { outline: none; border-color: rgba(120,150,255,.55); }
 .social-msg.bad { color: #ff8a9b; }
 
 @media (max-width: 420px) {
-  .social-btn span { display: none; }
+  /* a lone button has room for its label even on the narrowest screens */
+  .social-row:not(:has(.social-btn:only-child)) .social-btn span { display: none; }
   .social-btn { padding: 12px 8px; }
 }
+
+/* ======================= PASSWORD SHOW / HIDE ======================= */
+
+.pw-field { position: relative; }
+
+/* keep typed characters clear of the button */
+.pw-field input { padding-right: 46px; width: 100%; }
+
+.pw-toggle {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  width: 34px; height: 34px; padding: 0; border: none; border-radius: 9px;
+  background: none; cursor: pointer; color: var(--mist-dim);
+  display: grid; place-items: center;
+  transition: color .16s ease, background .16s ease;
+}
+.pw-toggle:hover  { color: #cdd8f5; background: rgba(120,150,255,.12); }
+.pw-toggle:focus-visible { outline: 2px solid rgba(120,150,255,.6); outline-offset: 1px; }
+.pw-toggle svg { width: 18px; height: 18px; }
+.pw-toggle svg[hidden] { display: none; }
+
+/* browsers add their own reveal control — two would be confusing */
+.pw-field input::-ms-reveal,
+.pw-field input::-ms-clear { display: none; }
