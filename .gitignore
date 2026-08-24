@@ -2,3 +2,6 @@ config.php
 trial.db
 *.log
 .DS_Store
+assets/uploads/avatars/*
+!assets/uploads/avatars/.htaccess
+!assets/uploads/avatars/.gitkeep

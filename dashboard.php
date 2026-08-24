@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/account_nav.php';
 
 $user = require_login();
 
@@ -17,36 +18,22 @@ $justPlaced = isset($_GET['placed']);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — BlueSky Agency</title>
-<link rel="icon" href="assets/img/logo-mark.png">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="/assets/img/logo-mark.png">
+<link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
 <div class="bg-mesh"></div>
 <div class="bg-grain"></div>
 
-<header class="navbar scrolled">
-  <div class="container nav-inner">
-    <a href="/" class="brand">
-      <img src="assets/img/logo-mark.png" alt="BlueSky Agency">
-      <span class="brand-word">BLUE<b>SKY</b></span>
-    </a>
-    <nav class="nav-links">
-      <a href="/contact">Contact</a>
-    </nav>
-    <div class="nav-cta">
-      <a href="/logout" class="btn btn-ghost btn-sm">Log Out</a>
-    </div>
-  </div>
-</header>
+<?= account_navbar($user, 'dashboard') ?>
 
-<section class="section" style="padding-top:40px;">
+<section class="section app-page">
   <div class="container app-wrap wide">
     <div class="app-nav">
       <div>
         <div class="eyebrow">Your Account</div>
         <h1 style="margin-bottom:0;">Dashboard</h1>
       </div>
-      <span class="who">Logged in as <b><?= e($user['name']) ?></b></span>
     </div>
 
     <?php if ($justPaid): ?>
@@ -111,5 +98,6 @@ $justPlaced = isset($_GET['placed']);
   </div>
 </section>
 
+<script src="/assets/js/main.js"></script>
 </body>
 </html>

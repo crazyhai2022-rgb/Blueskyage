@@ -928,3 +928,111 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 .section-head-center { text-align: center; margin-left: auto; margin-right: auto; }
 .section-head-center .eyebrow { justify-content: center; }
 .section-head-center .section-sub { margin-left: auto; margin-right: auto; }
+
+/* ======================= ACCOUNT AVATAR & MENU ======================= */
+
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; overflow: hidden; flex: 0 0 auto;
+  background: rgba(120,150,255,.16); border: 1px solid rgba(140,165,240,.28);
+  font-weight: 700; color: #e8edfb; line-height: 1; user-select: none;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.avatar-sm { width: 36px; height: 36px; font-size: 13px; }
+.avatar-md { width: 68px; height: 68px; font-size: 22px; }
+.avatar-lg { width: 92px; height: 92px; font-size: 30px; }
+
+/* initials fallback gets a stable tint per account */
+.avatar-initials {
+  background: linear-gradient(150deg,
+    hsl(var(--h) 70% 58% / .38), hsl(var(--h) 70% 40% / .22));
+  border-color: hsl(var(--h) 70% 62% / .4);
+}
+
+/* dropdown */
+.acct { position: relative; }
+
+.acct-btn {
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  padding: 4px 8px 4px 4px; border-radius: 999px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(140,165,240,.2);
+  color: var(--mist); font-family: inherit;
+  transition: background .18s ease, border-color .18s ease;
+}
+.acct-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(140,165,240,.4); }
+.acct-caret { width: 15px; height: 15px; transition: transform .2s ease; }
+.acct.open .acct-caret { transform: rotate(180deg); }
+
+.acct-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 950;
+  min-width: 216px; padding: 8px; border-radius: 14px;
+  background: rgba(14,19,38,.96); backdrop-filter: blur(16px);
+  border: 1px solid rgba(140,165,240,.22);
+  box-shadow: 0 20px 50px rgba(4,7,18,.6);
+  animation: acctIn .16s ease both;
+}
+.acct-menu[hidden] { display: none; }
+@keyframes acctIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+.acct-head {
+  padding: 9px 11px 12px; margin-bottom: 6px;
+  border-bottom: 1px solid rgba(140,165,240,.14);
+}
+.acct-head b { display: block; font-size: 14px; color: #e8edfb; }
+.acct-head span {
+  display: block; font-size: 12px; color: var(--mist-dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.acct-menu a {
+  display: block; padding: 9px 11px; border-radius: 9px;
+  font-size: 14px; color: var(--mist); text-decoration: none;
+}
+.acct-menu a:hover { background: rgba(120,150,255,.14); color: #fff; }
+.acct-menu a.on { background: rgba(59,98,255,.18); color: #dbe4ff; }
+.acct-menu a.danger { color: #ff97a6; margin-top: 4px; }
+.acct-menu a.danger:hover { background: rgba(255,90,110,.14); color: #ffb3bf; }
+
+/* ============================= PROFILE ============================= */
+
+.profile-summary {
+  display: flex; align-items: center; gap: 22px;
+  padding: 26px; margin-bottom: 22px;
+}
+.profile-summary:hover { transform: none; }
+.profile-meta { min-width: 0; }
+.profile-meta h2 { margin: 0 0 12px; font-size: 22px; }
+
+.profile-facts { display: flex; flex-wrap: wrap; gap: 10px 30px; }
+.profile-facts span {
+  display: block; font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--mist-dim); margin-bottom: 3px;
+}
+.profile-facts b { font-size: 14px; font-weight: 600; color: #e8edfb; }
+
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.profile-card { padding: 24px 26px; }
+.profile-card:hover { transform: none; }
+.profile-card .form-group:last-of-type { margin-bottom: 18px; }
+
+.profile-note { color: var(--mist-dim); font-size: 13.5px; line-height: 1.7; margin: 0; }
+
+.avatar-pick { display: flex; align-items: center; gap: 18px; }
+.avatar-pick label { cursor: pointer; }
+.avatar-pick .field-hint { margin-top: 8px; }
+.avatar-pick .field-hint.bad { color: #ff8a9b; }
+
+@media (max-width: 860px) {
+  .profile-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .profile-summary { flex-direction: column; text-align: center; gap: 16px; padding: 24px 18px; }
+  .profile-facts { justify-content: center; gap: 12px 22px; }
+  .profile-card { padding: 20px 18px; }
+  .acct-menu { min-width: 190px; }
+}
+
+/* logged-in pages start below the fixed navbar */
+.app-page { padding-top: 118px; padding-bottom: 70px; }
+@media (max-width: 700px) { .app-page { padding-top: 100px; } }

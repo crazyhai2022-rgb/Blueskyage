@@ -23,12 +23,16 @@ deployment:
     - /bin/cp -f login.php $DEPLOYPATH
     - /bin/cp -f logout.php $DEPLOYPATH
     - /bin/cp -f dashboard.php $DEPLOYPATH
+    - /bin/cp -f profile.php $DEPLOYPATH
     - /bin/cp -f checkout.php $DEPLOYPATH
     - /bin/cp -f config.example.php $DEPLOYPATH
 
     # Backend + assets
     - /bin/mkdir -p $DEPLOYPATH/includes $DEPLOYPATH/api $DEPLOYPATH/admin
     - /bin/mkdir -p $DEPLOYPATH/assets/css $DEPLOYPATH/assets/js $DEPLOYPATH/assets/img
+    - /bin/mkdir -p $DEPLOYPATH/assets/uploads/avatars
+    - /bin/cp -f assets/uploads/avatars/.htaccess $DEPLOYPATH/assets/uploads/avatars/
+    - /bin/chmod 775 $DEPLOYPATH/assets/uploads/avatars
     - /bin/cp -f includes/*.php $DEPLOYPATH/includes/
     - /bin/cp -f includes/.htaccess $DEPLOYPATH/includes/
     - /bin/cp -f api/*.php $DEPLOYPATH/api/

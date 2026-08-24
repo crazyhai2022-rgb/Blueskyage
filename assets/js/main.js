@@ -204,3 +204,37 @@ Message: ${data.message || "-"}`;
     if (form) form.addEventListener('submit', function () { setShown(false); });
   });
 })();
+
+// --- ACCOUNT DROPDOWN -------------------------------------------------
+(function () {
+  const wrap = document.querySelector('[data-acct]');
+  if (!wrap) return;
+
+  const btn  = wrap.querySelector('.acct-btn');
+  const menu = wrap.querySelector('.acct-menu');
+
+  function close() {
+    menu.hidden = true;
+    wrap.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function open() {
+    menu.hidden = false;
+    wrap.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    menu.hidden ? open() : close();
+  });
+
+  // clicking anywhere else, or pressing Escape, dismisses it
+  document.addEventListener('click', function (e) {
+    if (!menu.hidden && !wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !menu.hidden) { close(); btn.focus(); }
+  });
+})();

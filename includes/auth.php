@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 function current_user(): ?array {
     if (empty($_SESSION['user_id'])) return null;
-    $stmt = get_db()->prepare("SELECT id, name, email, phone, created_at FROM users WHERE id = ?");
+    $stmt = get_db()->prepare("SELECT id, name, email, phone, avatar_url, provider, created_at FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $u = $stmt->fetch();
     return $u ?: null;

@@ -100,8 +100,28 @@ class SupabaseStatement {
         } elseif (preg_match('/^SELECT id, password_hash FROM users WHERE email = \?$/i', $sql)) {
             $this->rows = $this->db->request('GET', 'users?select=id,password_hash&email=eq.' . rawurlencode($params[0]));
 
-        } elseif (preg_match('/^SELECT id, name, email, phone, created_at FROM users WHERE id = \?$/i', $sql)) {
-            $this->rows = $this->db->request('GET', 'users?select=id,name,email,phone,created_at&id=eq.' . (int)$params[0]);
+        } elseif (preg_match('/^SELECT id, name, email, phone, avatar_url, provider, created_at FROM users WHERE id = \?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'users?select=id,name,email,phone,avatar_url,provider,created_at&id=eq.' . (int)$params[0]);
+
+        } elseif (preg_match('/^SELECT id, email, password_hash FROM users WHERE id = \?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'users?select=id,email,password_hash&id=eq.' . (int)$params[0]);
+
+        } elseif (preg_match('/^SELECT id FROM users WHERE email = \? AND id <> \?$/i', $sql)) {
+            $this->rows = $this->db->request('GET', 'users?select=id&email=eq.' . rawurlencode($params[0])
+                . '&id=neq.' . (int)$params[1]);
+
+        } elseif (preg_match('/^UPDATE users SET avatar_url = \? WHERE id = \?$/i', $sql)) {
+            $this->db->request('PATCH', 'users?id=eq.' . (int)$params[1], ['avatar_url' => $params[0]]);
+
+        } elseif (preg_match('/^UPDATE users SET email = \? WHERE id = \?$/i', $sql)) {
+            $this->db->request('PATCH', 'users?id=eq.' . (int)$params[1], ['email' => $params[0]]);
+
+        } elseif (preg_match('/^UPDATE users SET password_hash = \? WHERE id = \?$/i', $sql)) {
+            $this->db->request('PATCH', 'users?id=eq.' . (int)$params[1], ['password_hash' => $params[0]]);
+
+        } elseif (preg_match('/^UPDATE users SET name = \?, phone = \? WHERE id = \?$/i', $sql)) {
+            $this->db->request('PATCH', 'users?id=eq.' . (int)$params[2],
+                ['name' => $params[0], 'phone' => $params[1]]);
 
         } elseif (preg_match('/^SELECT id, username FROM admins WHERE id = \?$/i', $sql)) {
             $this->rows = $this->db->request('GET', 'admins?select=id,username&id=eq.' . (int)$params[0]);
