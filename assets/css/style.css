@@ -713,11 +713,31 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 /* coupon */
 .ck-coupon { margin-top: 20px; padding-top: 18px; border-top: 1px dashed rgba(120,150,255,.22); }
 .ck-coupon label { display: block; font-size: 12.5px; color: var(--mist); margin-bottom: 8px; }
-.ck-coupon-row { display: flex; gap: 8px; }
-.ck-coupon-row input {
-  flex: 1; min-width: 0; text-transform: uppercase; letter-spacing: .06em;
+.ck-coupon-row {
+  display: flex; align-items: stretch; gap: 0;
+  border-radius: 12px; overflow: hidden;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--glass-border);
+  transition: border-color .25s, background .25s;
 }
-.ck-coupon-row .btn { flex: 0 0 auto; }
+.ck-coupon-row:focus-within {
+  border-color: var(--blue-light);
+  background: rgba(59,98,255,.06);
+}
+.ck-coupon-row input {
+  flex: 1; min-width: 0;
+  background: none; border: none; border-radius: 0;
+  padding: 13px 15px;
+  text-transform: uppercase; letter-spacing: .08em; font-size: 14px;
+}
+.ck-coupon-row input:focus { background: none; border: none; }
+.ck-coupon-row .btn {
+  flex: 0 0 auto; border-radius: 0; border: none;
+  padding: 0 20px; font-size: 13.5px;
+  background: rgba(120,150,255,.16); color: #dbe4ff;
+  border-left: 1px solid var(--glass-border);
+}
+.ck-coupon-row .btn:hover { background: rgba(120,150,255,.3); color: #fff; transform: none; }
 .ck-coupon-msg { margin: 9px 0 0; font-size: 12px; min-height: 15px; color: var(--mist-dim); }
 .ck-coupon-msg.good { color: #7fe0a8; }
 .ck-coupon-msg.bad  { color: #ff8a9b; }
@@ -866,13 +886,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 
 /* ==================== CHECKOUT -- RAZORPAY TRUST BADGE ==================== */
 .ck-badge {
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-  margin-top: 14px; padding-top: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 16px; padding-top: 15px;
   border-top: 1px solid rgba(140,165,240,.12);
-  color: var(--mist-dim); font-size: 11.5px;
+  color: var(--mist-dim); font-size: 11.5px; line-height: 1;
 }
-.ck-badge svg { flex: 0 0 auto; opacity: .8; }
-.ck-badge img { height: 17px; width: auto; opacity: .95; }
+.ck-badge svg {
+  flex: 0 0 14px; width: 14px; height: 14px;
+  opacity: .8; display: block;
+}
+.ck-badge span { line-height: 1; }
+.ck-badge img { height: 16px; width: auto; opacity: .95; display: block; }
 
 /* ============================= LEGAL PAGES ============================= */
 
@@ -1125,22 +1149,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 
 /* ===================== PHONE & DEPOSIT FIELD ROWS ===================== */
 
-.phone-row { display: flex; gap: 8px; }
-.phone-row select { flex: 0 0 104px; width: 104px; padding-right: 32px; background-position: right 10px center; }
-.phone-row input  { flex: 1; min-width: 0; }
+/* Country code and number sit on one line, always. */
+.phone-row { display: flex !important; flex-wrap: nowrap; gap: 8px; align-items: stretch; }
+.phone-row select {
+  flex: 0 0 100px; width: 100px !important; min-width: 0;
+  padding-right: 30px; background-position: right 9px center;
+}
+.phone-row input { flex: 1 1 auto; width: auto !important; min-width: 0; }
 
-.deposit-row { display: flex; gap: 10px; align-items: stretch; }
-.deposit-row select { flex: 1; min-width: 0; }
+/* Dollars on the left, the rupee conversion on the right. */
+.deposit-row { display: flex !important; flex-wrap: nowrap; gap: 10px; align-items: stretch; }
+.deposit-row select { flex: 1 1 auto; width: auto !important; min-width: 0; }
 .deposit-inr {
-  flex: 0 0 auto; min-width: 116px;
+  flex: 0 0 auto; min-width: 118px;
   display: flex; align-items: center; justify-content: center;
   padding: 14px 16px; border-radius: 12px;
-  background: rgba(59,98,255,.1); border: 1px solid rgba(120,150,255,.28);
+  background: rgba(59,98,255,.12); border: 1px solid rgba(120,150,255,.3);
   color: #dbe4ff; font-weight: 700; font-size: 15px; white-space: nowrap;
 }
 
-@media (max-width: 480px) {
-  .deposit-row { flex-direction: column; }
-  .deposit-inr { min-width: 0; }
-  .phone-row select { flex-basis: 92px; width: 92px; }
+@media (max-width: 420px) {
+  .phone-row select { flex-basis: 86px; width: 86px !important; padding-left: 10px; }
+  .deposit-inr { min-width: 96px; padding: 14px 10px; font-size: 14px; }
 }

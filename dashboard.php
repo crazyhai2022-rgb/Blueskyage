@@ -19,7 +19,7 @@ $justPlaced = isset($_GET['placed']);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — BlueSky Agency</title>
 <link rel="icon" href="/assets/img/logo-mark.png">
-<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/style.css?v=<?= @filemtime(__DIR__ . '/assets/css/style.css') ?>">
 </head>
 <body>
 <div class="bg-mesh"></div>
@@ -98,6 +98,6 @@ $justPlaced = isset($_GET['placed']);
   </div>
 </section>
 
-<script src="/assets/js/main.js"></script>
+<script src="/assets/js/main.js?v=<?= @filemtime(__DIR__ . '/assets/js/main.js') ?>"></script>
 </body>
 </html>
