@@ -8,7 +8,7 @@ $email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $pass  = $_POST['password'] ?? '';
 
     $stmt = get_db()->prepare("SELECT id, password_hash FROM users WHERE email = ?");

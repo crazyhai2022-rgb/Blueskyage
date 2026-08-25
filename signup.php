@@ -9,7 +9,7 @@ $name = $email = $phone = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $name  = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $phone = trim($_POST['phone'] ?? '');
     $pass  = $_POST['password'] ?? '';
 
