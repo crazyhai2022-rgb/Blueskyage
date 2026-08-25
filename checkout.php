@@ -47,11 +47,6 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
   <div class="container app-wrap wide">
 
     <div class="ck-hero">
-      <div class="ck-logo-ring">
-        <span class="ck-ring ck-ring-1"></span>
-          <span class="ck-ring ck-ring-2"></span>
-          <img src="assets/img/logo-mark.png" alt="" class="ck-logo">
-      </div>
       <div>
         <div class="eyebrow">Secure Checkout</div>
         <h1>Complete your order</h1>
