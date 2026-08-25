@@ -31,16 +31,63 @@ function status_class(string $status): string {
  * 'recurring' marks a monthly subscription; products are one-time.
  */
 function catalog(): array {
+    /* 'fields' lists exactly what checkout should ask for. Name, WhatsApp,
+       and email are always collected, so they aren't listed here. */
     return [
         // --- Ad account rental plans (monthly) ---
-        'basic'              => ['name' => 'Basic Plan — Meta Agency Ad Account', 'amount' => 1499, 'recurring' => true],
-        'pro'                => ['name' => 'Pro Plan — Meta Agency Ad Account',   'amount' => 2499, 'recurring' => true],
+        'basic' => [
+            'name' => 'Basic Plan — Meta Agency Ad Account', 'amount' => 1499, 'recurring' => true,
+            'usd_rate' => 105,                      // ₹ per $ when loading ad funds
+            'fields' => ['business', 'bmid', 'deposit'],
+        ],
+        'pro' => [
+            'name' => 'Pro Plan — Meta Agency Ad Account', 'amount' => 2499, 'recurring' => true,
+            'usd_rate' => 104,
+            'fields' => ['business', 'bmid', 'deposit'],
+        ],
+
         // --- One-time products ---
-        'facebook-page'      => ['name' => 'Facebook Page',              'amount' => 1499, 'recurring' => false],
-        'name-change-page'   => ['name' => 'Name Changeable Page',       'amount' => 1999, 'recurring' => false],
-        'old-profile'        => ['name' => '15 Years Old Profile',       'amount' => 2499, 'recurring' => false],
-        'verified-profile'   => ['name' => 'Identity Confirmed Profile', 'amount' => 8999, 'recurring' => false],
-        'instagram-account'  => ['name' => 'Instagram Account',          'amount' => 999,  'recurring' => false],
+        'facebook-page' => [
+            'name' => 'Facebook Page', 'amount' => 1499, 'recurring' => false,
+            'fields' => ['business', 'profile_link'],
+        ],
+        'name-change-page' => [
+            'name' => 'Name Changeable Page', 'amount' => 1999, 'recurring' => false,
+            'fields' => ['business', 'profile_link', 'page_name'],
+        ],
+        'old-profile' => [
+            'name' => '15 Years Old Profile', 'amount' => 2499, 'recurring' => false,
+            'fields' => ['business'],
+        ],
+        'verified-profile' => [
+            'name' => 'Identity Confirmed Profile', 'amount' => 8999, 'recurring' => false,
+            'fields' => ['business'],
+        ],
+        'instagram-account' => [
+            'name' => 'Instagram Account', 'amount' => 999, 'recurring' => false,
+            'fields' => ['business'],
+        ],
+    ];
+}
+
+/** Deposit amounts offered at checkout, in US dollars. */
+function deposit_options(): array {
+    return [15, 30, 50, 100, 200, 300, 400, 500];
+}
+
+/** Country codes for the WhatsApp field. India first, since most clients are here. */
+function country_codes(): array {
+    return [
+        '+91'  => 'India',
+        '+1'   => 'USA / Canada',
+        '+44'  => 'UK',
+        '+971' => 'UAE',
+        '+880' => 'Bangladesh',
+        '+977' => 'Nepal',
+        '+92'  => 'Pakistan',
+        '+65'  => 'Singapore',
+        '+61'  => 'Australia',
+        '+49'  => 'Germany',
     ];
 }
 

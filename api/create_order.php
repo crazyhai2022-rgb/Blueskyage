@@ -20,7 +20,20 @@ if (!$item) {
     exit;
 }
 
-$db       = get_db();
+$db = get_db();
+
+/* Ad funds: only the amounts we actually offer are accepted, and the rate
+   comes from the catalog — never from the browser. */
+$depositUsd = 0;
+$depositInr = 0;
+if (in_array('deposit', $item['fields'] ?? [], true)) {
+    $requested = (int)($input['deposit_usd'] ?? 0);
+    if ($requested > 0 && in_array($requested, deposit_options(), true)) {
+        $depositUsd = $requested;
+        $depositInr = $depositUsd * (int)($item['usd_rate'] ?? 105);
+    }
+}
+
 $original = $item['amount'];
 $discount = 0;
 $couponCode = null;
@@ -38,21 +51,27 @@ if (!empty($input['coupon'])) {
     $discount   = coupon_discount($original, (int)$coupon['percent_off']);
 }
 
-$amount = $original - $discount;
+// The coupon discounts the plan only; ad funds are added at face value.
+$amount = ($original - $discount) + $depositInr;
 
 $stmt = $db->prepare(
     "INSERT INTO orders (user_id, plan, amount, bm_id, business_name, status, coupon_code, discount, original_amount)
      VALUES (?, ?, ?, ?, ?, 'pending_payment', ?, ?, ?)"
 );
+$planLabel = $item['name'];
+if ($depositUsd > 0) {
+    $planLabel .= ' + $' . $depositUsd . ' ad funds';
+}
+
 $stmt->execute([
     $user['id'],
-    $item['name'],
+    $planLabel,
     $amount,
     trim($input['bmid'] ?? ''),
     trim($input['business'] ?? ''),
     $couponCode,
     $discount,
-    $original,
+    $original + $depositInr,
 ]);
 $orderId = (int)$db->lastInsertId();
 

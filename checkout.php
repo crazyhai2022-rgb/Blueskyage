@@ -10,6 +10,20 @@ if (!$item) { header('Location: /services'); exit; }
 // Send guests to log in first, then straight back here.
 $user = require_login();
 
+$fields   = $item['fields'] ?? [];
+$usdRate  = $item['usd_rate'] ?? 105;
+
+/* The stored phone may already carry a country code — split it so the
+   selector and the number field don't end up showing it twice. */
+$storedPhone = trim($user['phone'] ?? '');
+$localPhone  = $storedPhone;
+foreach (array_keys(country_codes()) as $cc) {
+    if (str_starts_with($storedPhone, $cc)) {
+        $localPhone = trim(substr($storedPhone, strlen($cc)));
+        break;
+    }
+}
+
 $paymentsReady = defined('RAZORPAY_KEY_ID')
     && RAZORPAY_KEY_ID !== 'YOUR_RAZORPAY_KEY_ID'
     && RAZORPAY_KEY_ID !== '';
@@ -73,6 +87,11 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
           <span class="ck-amt" id="basePrice">&#8377;<?= number_format($item['amount']) ?></span>
         </div>
 
+        <div class="ck-line" id="depositRow" hidden>
+          <div><b>Ad Account Deposit</b><span id="depositLabel"></span></div>
+          <span class="ck-amt" id="depositAmt"></span>
+        </div>
+
         <div class="ck-line ck-discount" id="discountRow" hidden>
           <div><b>Coupon <span id="couponTag"></span></b><span id="couponPct"></span></div>
           <span class="ck-amt ck-green" id="discountAmt"></span>
@@ -102,14 +121,20 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
         <div id="checkoutError" class="alert alert-error" style="display:none;"></div>
 
         <form id="checkoutForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="fullname">Full Name</label>
-              <input type="text" id="fullname" value="<?= e($user['name']) ?>" required>
-            </div>
-            <div class="form-group">
-              <label for="phone">WhatsApp Number</label>
-              <input type="tel" id="phone" value="<?= e($user['phone']) ?>" required>
+          <div class="form-group">
+            <label for="fullname">Full Name</label>
+            <input type="text" id="fullname" value="<?= e($user['name']) ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">WhatsApp Number</label>
+            <div class="phone-row">
+              <select id="ccode" aria-label="Country code">
+                <?php foreach (country_codes() as $code => $country): ?>
+                  <option value="<?= e($code) ?>"<?= $code === '+91' ? ' selected' : '' ?>><?= e($code) ?></option>
+                <?php endforeach; ?>
+              </select>
+              <input type="tel" id="phone" value="<?= e($localPhone) ?>" placeholder="98765 43210" required>
             </div>
           </div>
 
@@ -118,42 +143,52 @@ $paymentsReady = defined('RAZORPAY_KEY_ID')
             <input type="email" id="email" value="<?= e($user['email']) ?>" required>
           </div>
 
+<?php if (in_array('business', $fields, true)): ?>
           <div class="form-group">
-            <label for="business">Business / Brand Name</label>
-            <input type="text" id="business" placeholder="Your business name" required>
+            <label for="business">Business / Brand Name <span class="opt">(optional)</span></label>
+            <input type="text" id="business" placeholder="Your business name">
           </div>
+<?php endif; ?>
 
-          <?php if ($item['recurring']): ?>
-            <div class="form-group">
-              <label for="bmid">Business Portfolio ID (BM ID)</label>
-              <input type="text" id="bmid" placeholder="e.g. 123456789012345" required>
-              <small class="field-hint">Meta Business Suite &rarr; Settings &rarr; Business Info</small>
-            </div>
-            <div class="form-group">
-              <label for="niche">What do you advertise?</label>
-              <input type="text" id="niche" placeholder="e.g. clothing store, real estate, coaching">
-            </div>
-            <div class="form-group">
-              <label for="spend">Expected monthly ad spend</label>
-              <select id="spend">
-                <option value="">Select a range</option>
-                <option>Under &#8377;50,000</option>
-                <option>&#8377;50,000 &ndash; &#8377;2,00,000</option>
-                <option>&#8377;2,00,000 &ndash; &#8377;10,00,000</option>
-                <option>Above &#8377;10,00,000</option>
+<?php if (in_array('bmid', $fields, true)): ?>
+          <div class="form-group">
+            <label for="bmid">Business Portfolio ID (BM ID)</label>
+            <input type="text" id="bmid" placeholder="e.g. 123456789012345" required>
+            <small class="field-hint">Meta Business Suite &rarr; Settings &rarr; Business Info</small>
+          </div>
+<?php endif; ?>
+
+<?php if (in_array('profile_link', $fields, true)): ?>
+          <div class="form-group">
+            <label for="profile_link">Facebook Profile Link</label>
+            <input type="url" id="profile_link" placeholder="https://facebook.com/yourprofile" required>
+            <small class="field-hint">We add you to the page from this profile.</small>
+          </div>
+<?php endif; ?>
+
+<?php if (in_array('page_name', $fields, true)): ?>
+          <div class="form-group">
+            <label for="page_name">What page name do you want?</label>
+            <input type="text" id="page_name" placeholder="The name your page should carry" required>
+            <small class="field-hint">This plan lets us set the name you choose.</small>
+          </div>
+<?php endif; ?>
+
+<?php if (in_array('deposit', $fields, true)): ?>
+          <div class="form-group">
+            <label for="deposit">Ad Account Deposit Fund</label>
+            <div class="deposit-row">
+              <select id="deposit">
+                <option value="0">$0 — add funds later</option>
+                <?php foreach (deposit_options() as $usd): ?>
+                  <option value="<?= (int)$usd ?>">$<?= (int)$usd ?></option>
+                <?php endforeach; ?>
               </select>
+              <div class="deposit-inr" id="depositInr">&#8377;0</div>
             </div>
-          <?php else: ?>
-            <div class="form-group">
-              <label for="niche">What will you use this for?</label>
-              <input type="text" id="niche" placeholder="e.g. running ads for my clothing brand">
-            </div>
-          <?php endif; ?>
-
-          <div class="form-group">
-            <label for="notes">Anything we should know? <span class="opt">(optional)</span></label>
-            <textarea id="notes" rows="2" placeholder="Special requests or questions"></textarea>
+            <small class="field-hint">Loaded straight into your ad account at &#8377;<?= (int)$usdRate ?> per $. Minimum first deposit is $15.</small>
           </div>
+<?php endif; ?>
 
           <button type="submit" class="btn btn-primary btn-block btn-lg" id="payBtn">
             <?= $paymentsReady ? 'Pay &#8377;' . number_format($item['amount']) : 'Place Order &mdash; &#8377;' . number_format($item['amount']) ?>
@@ -197,9 +232,34 @@ const BASE_AMOUNT   = <?= (int)$item['amount'] ?>;
 const PAYMENTS_READY= <?= $paymentsReady ? 'true' : 'false' ?>;
 const RZP_KEY       = <?= json_encode($paymentsReady ? RAZORPAY_KEY_ID : '') ?>;
 const PLAN_NAME     = <?= json_encode($item['name']) ?>;
+const USD_RATE      = <?= (int)$usdRate ?>;
 
 let appliedCoupon = null;
+let couponDiscount = 0;
+let depositUsd    = 0;
 let currentTotal  = BASE_AMOUNT;
+
+/* Total = plan price − coupon discount + ad funds.
+   The coupon only ever discounts the plan, never the deposit — that money
+   goes into the ad account at face value. */
+function recalcTotal() {
+  const depositInr = depositUsd * USD_RATE;
+  currentTotal = Math.max(1, BASE_AMOUNT - couponDiscount) + depositInr;
+
+  const row = document.getElementById('depositRow');
+  if (row) {
+    if (depositUsd > 0) {
+      document.getElementById('depositLabel').textContent = '$' + depositUsd + ' at \u20B9' + USD_RATE + ' per $';
+      document.getElementById('depositAmt').textContent = inr(depositInr);
+      row.hidden = false;
+    } else {
+      row.hidden = true;
+    }
+  }
+
+  document.getElementById('totalAmt').textContent = inr(currentTotal);
+  setPayLabel();
+}
 
 const inr = n => '\u20B9' + Number(n).toLocaleString('en-IN');
 
@@ -236,26 +296,24 @@ document.getElementById('applyCoupon').addEventListener('click', async () => {
     const d = await res.json();
 
     if (!d.ok) {
-      appliedCoupon = null;
-      currentTotal = BASE_AMOUNT;
+      appliedCoupon  = null;
+      couponDiscount = 0;
       document.getElementById('discountRow').hidden = true;
-      document.getElementById('totalAmt').textContent = inr(BASE_AMOUNT);
       couponMsg.textContent = d.error;
       couponMsg.className = 'ck-coupon-msg bad';
-      setPayLabel();
+      recalcTotal();
       return;
     }
 
-    appliedCoupon = d.code;
-    currentTotal  = d.total;
+    appliedCoupon  = d.code;
+    couponDiscount = d.discount;
     document.getElementById('couponTag').textContent   = d.code;
     document.getElementById('couponPct').textContent   = d.percent + '% off applied';
     document.getElementById('discountAmt').textContent = '\u2212' + inr(d.discount);
     document.getElementById('discountRow').hidden      = false;
-    document.getElementById('totalAmt').textContent    = inr(d.total);
     couponMsg.textContent = 'Coupon applied \u2014 you save ' + inr(d.discount) + '!';
     couponMsg.className = 'ck-coupon-msg good';
-    setPayLabel();
+    recalcTotal();
   } catch (e) {
     couponMsg.textContent = 'Could not check that code. Try again.';
     couponMsg.className = 'ck-coupon-msg bad';
@@ -266,6 +324,16 @@ couponIn.addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); document.getElementById('applyCoupon').click(); }
 });
 
+/* ---------- deposit ---------- */
+const depositSel = document.getElementById('deposit');
+if (depositSel) {
+  depositSel.addEventListener('change', () => {
+    depositUsd = parseInt(depositSel.value, 10) || 0;
+    document.getElementById('depositInr').textContent = inr(depositUsd * USD_RATE);
+    recalcTotal();
+  });
+}
+
 /* ---------- submit ---------- */
 document.getElementById('checkoutForm').addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -274,22 +342,28 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
   payBtn.textContent = 'Please wait\u2026';
 
   const el = id => document.getElementById(id);
+  const val = id => (el(id) ? el(id).value.trim() : '');
+
+  // Everything the plan asked for, kept together on the order record.
   const extras = [
-    el('niche') && el('niche').value.trim() ? 'Niche: ' + el('niche').value.trim() : '',
-    el('spend') && el('spend').value ? 'Spend: ' + el('spend').value : '',
-    el('notes') && el('notes').value.trim() ? 'Notes: ' + el('notes').value.trim() : ''
+    val('profile_link') ? 'Profile: ' + val('profile_link') : '',
+    val('page_name') ? 'Page name: ' + val('page_name') : '',
+    depositUsd > 0 ? 'Deposit: $' + depositUsd + ' (\u20B9' + (depositUsd * USD_RATE) + ')' : ''
   ].filter(Boolean).join(' | ');
 
-  const business = el('business').value.trim() + (extras ? ' (' + extras + ')' : '');
+  const businessName = val('business') || '—';
+  const business = businessName + (extras ? ' (' + extras + ')' : '');
 
   try {
     const res = await fetch('api/create_order.php', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         plan: PLAN_SLUG,
-        bmid: el('bmid') ? el('bmid').value.trim() : '',
+        bmid: val('bmid'),
         business: business,
-        coupon: appliedCoupon
+        coupon: appliedCoupon,
+        deposit_usd: depositUsd,
+        phone: (el('ccode') ? el('ccode').value : '') + ' ' + val('phone')
       })
     });
     const data = await res.json();
@@ -308,7 +382,11 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
       description: PLAN_NAME,
       image: 'assets/img/logo-mark.png',
       order_id: data.razorpay_order_id,
-      prefill: { name: el('fullname').value, email: el('email').value, contact: el('phone').value },
+      prefill: {
+        name: val('fullname'),
+        email: val('email'),
+        contact: (el('ccode') ? el('ccode').value : '') + val('phone')
+      },
       theme: { color: '#3b62ff' },
       handler: async function (r) {
         const v = await fetch('api/verify_payment.php', {
