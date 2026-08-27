@@ -1297,7 +1297,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
   transition: background .18s ease, border-color .18s ease, color .18s ease;
 }
 .theme-toggle:hover { background: var(--glass-strong); border-color: var(--glass-border-strong); color: var(--white); }
-.theme-toggle svg { width: 17px; height: 17px; }
+.theme-toggle svg { width: 17px; height: 17px; flex: 0 0 17px; display: block; }
 .theme-toggle-label { display: none; }
 
 /* show the icon for the theme you'd switch TO */
@@ -1352,6 +1352,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
   font-size: 14px; color: var(--mist);
 }
 .acct-theme .theme-toggle:hover { background: rgba(120,150,255,.14); color: #fff; padding-left: 11px; }
+.acct-theme .theme-toggle svg { width: 16px; height: 16px; flex: 0 0 16px; }
 .acct-theme .theme-toggle-label { display: inline; }
 
 /* Desktop-only items disappear on phones, where the menu carries them. */
@@ -1368,3 +1369,66 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
 @media (min-width: 761px) {
   .acct-theme { display: none; }
 }
+
+/* ---- light theme: text that was hard-coded to a pale colour ----
+   These were written as literal light values rather than tokens, so on a
+   white page they came out almost invisible. */
+[data-theme="light"] .acct-head b,
+[data-theme="light"] .profile-facts b,
+[data-theme="light"] .legal-body strong,
+[data-theme="light"] .avatar,
+[data-theme="light"] .ck-form textarea,
+[data-theme="light"] .social-btn { color: var(--white); }
+
+[data-theme="light"] .legal-body em,
+[data-theme="light"] .pw-toggle:hover { color: var(--mist); }
+
+[data-theme="light"] .ck-step.active,
+[data-theme="light"] .acct-menu a.on,
+[data-theme="light"] .deposit-inr,
+[data-theme="light"] .ck-coupon-row .btn { color: var(--blue); }
+
+[data-theme="light"] .ck-step.active { background: rgba(47,82,230,.1); border-color: rgba(47,82,230,.35); }
+[data-theme="light"] .acct-menu a.on { background: rgba(47,82,230,.12); }
+[data-theme="light"] .ck-coupon-row .btn { background: rgba(47,82,230,.09); }
+[data-theme="light"] .ck-coupon-row .btn:hover { background: rgba(47,82,230,.18); color: var(--blue); }
+
+/* green/amber/red badges need darker ink on a light card */
+[data-theme="light"] .badge-green { background: rgba(22,140,90,.12); color: #147a52; }
+[data-theme="light"] .badge-amber { background: rgba(180,120,10,.12); color: #9a6a06; }
+[data-theme="light"] .badge-red   { background: rgba(200,50,74,.1);  color: #b32a42; }
+[data-theme="light"] .badge-grey  { background: rgba(40,60,130,.08); color: var(--mist); }
+[data-theme="light"] .ck-green,
+[data-theme="light"] .ck-coupon-msg.good,
+[data-theme="light"] .social-msg.good { color: #147a52; }
+[data-theme="light"] .ck-coupon-msg.bad,
+[data-theme="light"] .social-msg.bad,
+[data-theme="light"] .cart-del button { color: #b32a42; }
+
+[data-theme="light"] .alert-success { background: rgba(22,140,90,.09); border-color: rgba(22,140,90,.3); color: #147a52; }
+[data-theme="light"] .alert-error   { background: rgba(200,50,74,.08); border-color: rgba(200,50,74,.28); color: #b32a42; }
+
+[data-theme="light"] .theme-toggle { background: #fff; border-color: rgba(40,60,130,.2); }
+[data-theme="light"] .theme-toggle:hover { background: #f2f5ff; }
+[data-theme="light"] .acct-theme .theme-toggle { background: none; border: none; }
+[data-theme="light"] .acct-theme .theme-toggle:hover { background: rgba(47,82,230,.09); color: var(--blue); }
+[data-theme="light"] .acct-btn-plain .avatar { box-shadow: 0 0 0 3px rgba(47,82,230,.12); }
+
+[data-theme="light"] .field-hint,
+[data-theme="light"] .opt,
+[data-theme="light"] .qty-fixed { color: var(--mist-dim); }
+
+/* the completed-step green was tuned for a dark card; too pale on white */
+[data-theme="light"] .ck-step.done   { color: #147a52; border-color: rgba(20,122,82,.35); }
+[data-theme="light"] .ck-step.done i { background: rgba(20,122,82,.14); color: #147a52; }
+[data-theme="light"] .ck-perks li::before { color: #147a52; }
+[data-theme="light"] .ck-check circle,
+[data-theme="light"] .ck-check path { stroke: #147a52; }
+
+[data-theme="light"] .legal-updated {
+  background: rgba(47,82,230,.08);
+  border-color: rgba(47,82,230,.24);
+  color: var(--mist);
+}
+[data-theme="light"] .legal-callout { background: rgba(47,82,230,.06); border-color: rgba(47,82,230,.24); }
+[data-theme="light"] .legal-contact { background: #fff; border-color: rgba(40,60,130,.14); }

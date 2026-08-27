@@ -15,7 +15,7 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
 <title>Terms &amp; Conditions — BlueSky Agency</title>
 <meta name="description" content="The terms that apply when you use BlueSky Agency's services.">
 <link rel="icon" href="assets/img/logo-mark.png">
-<link rel="stylesheet" href="assets/css/style.css?v=202608251045">
+<link rel="stylesheet" href="assets/css/style.css?v=<?= @filemtime(__DIR__ . '/assets/css/style.css') ?>">
 </head>
 <body>
 <div class="bg-mesh"></div>
@@ -170,6 +170,6 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
   </div>
 </footer>
 
-<script src="assets/js/main.js?v=202608251045"></script>
+<script src="assets/js/main.js?v=<?= @filemtime(__DIR__ . '/assets/js/main.js') ?>"></script>
 </body>
 </html>

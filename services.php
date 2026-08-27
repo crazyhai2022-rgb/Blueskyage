@@ -15,7 +15,7 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
 <title>Services — BlueSky Agency</title>
 <meta name="description" content="Meta agency ad account plans, ads management and creative services from BlueSky Agency.">
 <link rel="icon" href="assets/img/logo-mark.png">
-<link rel="stylesheet" href="assets/css/style.css?v=202608251045">
+<link rel="stylesheet" href="assets/css/style.css?v=<?= @filemtime(__DIR__ . '/assets/css/style.css') ?>">
 </head>
 <body>
 
@@ -229,6 +229,6 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
 </footer>
 
 
-<script src="assets/js/main.js?v=202608251045"></script>
+<script src="assets/js/main.js?v=<?= @filemtime(__DIR__ . '/assets/js/main.js') ?>"></script>
 </body>
 </html>
