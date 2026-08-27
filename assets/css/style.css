@@ -1172,3 +1172,32 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
   .phone-row select { flex-basis: 86px; width: 86px !important; padding-left: 10px; }
   .deposit-inr { min-width: 96px; padding: 14px 10px; font-size: 14px; }
 }
+
+/* Avatar sitting next to the Dashboard button in the public navbar —
+   no pill around it, just the picture. */
+.nav-cta .acct { margin-left: 10px; }
+.acct-btn-plain {
+  padding: 0; background: none; border: none;
+  border-radius: 50%;
+}
+.acct-btn-plain:hover { background: none; }
+.acct-btn-plain .avatar {
+  width: 38px; height: 38px;
+  transition: border-color .18s ease, transform .18s ease;
+}
+.acct-btn-plain:hover .avatar {
+  border-color: rgba(140,165,240,.6);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 560px) {
+  /* Three items plus the burger is tight — shrink the button and gaps
+     so nothing rides over the logo. */
+  .nav-cta .btn-primary { padding: 8px 13px; font-size: 12.5px; }
+  .nav-cta .acct { margin-left: 6px; }
+  .acct-btn-plain .avatar { width: 32px; height: 32px; font-size: 12px; }
+  .nav-inner .brand-word { font-size: 15px; }
+}
+@media (max-width: 400px) {
+  .nav-inner .brand-word { display: none; }
+}

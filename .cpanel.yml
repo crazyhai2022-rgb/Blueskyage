@@ -9,14 +9,14 @@ deployment:
     - /bin/cp -f .htaccess $DEPLOYPATH
 
     # Pages
-    - /bin/cp -f index.html $DEPLOYPATH
-    - /bin/cp -f services.html $DEPLOYPATH
-    - /bin/cp -f products.html $DEPLOYPATH
-    - /bin/cp -f contact.html $DEPLOYPATH
-    - /bin/cp -f shipping-delivery.html $DEPLOYPATH
-    - /bin/cp -f refund-cancellation.html $DEPLOYPATH
-    - /bin/cp -f terms.html $DEPLOYPATH
-    - /bin/cp -f privacy-policy.html $DEPLOYPATH
+    - /bin/cp -f index.php $DEPLOYPATH
+    - /bin/cp -f services.php $DEPLOYPATH
+    - /bin/cp -f products.php $DEPLOYPATH
+    - /bin/cp -f contact.php $DEPLOYPATH
+    - /bin/cp -f shipping-delivery.php $DEPLOYPATH
+    - /bin/cp -f refund-cancellation.php $DEPLOYPATH
+    - /bin/cp -f terms.php $DEPLOYPATH
+    - /bin/cp -f privacy-policy.php $DEPLOYPATH
 
     # Client area (PHP)
     - /bin/cp -f signup.php $DEPLOYPATH

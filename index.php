@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/includes/site_nav.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,23 +20,7 @@
 <div class="bg-grain"></div>
 
 <!-- NAVBAR -->
-<header class="navbar">
-  <div class="container nav-inner">
-    <a href="/" class="brand">
-      <img src="assets/img/logo-mark.png" alt="BlueSky Agency">
-      <span class="brand-word">BLUE<b>SKY</b></span>
-    </a>
-    <nav class="nav-links">
-      <a href="/" class="active">Home</a>
-      <a href="/products">Products</a>
-      <a href="/contact">Contact</a>
-    </nav>
-    <div class="nav-cta">
-      <a href="/dashboard" class="btn btn-ghost btn-sm" style="margin-right:8px;">My Account</a>
-      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-</header>
+<?= site_nav('home') ?>
 
 <!-- HERO -->
 <section class="hero">
