@@ -238,3 +238,22 @@ Message: ${data.message || "-"}`;
     if (e.key === 'Escape' && !menu.hidden) { close(); btn.focus(); }
   });
 })();
+
+// --- THEME SWITCH ----------------------------------------------------
+(function () {
+  const KEY = "bluesky-theme";
+
+  function apply(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.colorScheme = theme;
+  }
+
+  document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const now = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+      apply(now);
+      try { localStorage.setItem(KEY, now); } catch (err) {}
+    });
+  });
+})();

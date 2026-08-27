@@ -45,43 +45,17 @@ function avatar_markup(array $user, string $size = 'md'): string {
          . e(user_initials($user['name'])) . '</span>';
 }
 
-/**
- * The right-hand side of the navbar. Logged out it's a single "My Account"
- * pill; logged in it's a Dashboard button plus the avatar menu.
- */
-function nav_cta(?array $user, string $active = ''): string {
-    if (!$user) {
-        return '<a href="/login" class="btn btn-ghost btn-sm">My Account</a>';
-    }
-
-    $avatar = avatar_markup($user, 'sm');
-    $dash   = $active === 'dashboard' ? ' class="on"' : '';
-    $prof   = $active === 'profile'   ? ' class="on"' : '';
-    $name   = e($user['name']);
-    $email  = e($user['email']);
-
-    return <<<HTML
-<a href="/dashboard" class="btn btn-primary btn-sm nav-dash">Dashboard</a>
-      <div class="acct" data-acct>
-        <button type="button" class="acct-btn" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
-          {$avatar}
-        </button>
-        <div class="acct-menu" hidden>
-          <div class="acct-head">
-            <b>{$name}</b>
-            <span>{$email}</span>
-          </div>
-          <a href="/dashboard"{$dash}>Dashboard</a>
-          <a href="/profile"{$prof}>My Profile</a>
-          <a href="/logout" class="danger">Log Out</a>
-        </div>
-      </div>
-HTML;
-}
-
 /** The navbar shown on logged-in pages, with the profile dropdown. */
 function account_navbar(array $user, string $active = ''): string {
-    $cta = nav_cta($user, $active);
+    require_once __DIR__ . '/site_nav.php';
+
+    $avatar = avatar_markup($user, 'sm');
+    $dash   = $active === 'dashboard' ? ' on' : '';
+    $prof   = $active === 'profile'   ? ' on' : '';
+    $name   = e($user['name']);
+    $email  = e($user['email']);
+    $toggleDesktop = theme_toggle('only-desktop');
+    $toggleMenu    = theme_toggle('menu-theme');
 
     return <<<HTML
 <header class="navbar scrolled">
@@ -95,7 +69,24 @@ function account_navbar(array $user, string $active = ''): string {
       <a href="/contact">Contact</a>
     </nav>
     <div class="nav-cta">
-      {$cta}
+      <a href="/dashboard" class="btn btn-primary btn-sm only-desktop">Dashboard</a>
+      {$toggleDesktop}
+      <div class="acct" data-acct>
+        <button type="button" class="acct-btn acct-btn-plain" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
+          {$avatar}
+          <svg class="acct-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="acct-menu" hidden>
+          <div class="acct-head">
+            <b>{$name}</b>
+            <span>{$email}</span>
+          </div>
+          <a href="/dashboard" class="only-mobile-menu{$dash}">Dashboard</a>
+          <a href="/profile" class="{$prof}">My Profile</a>
+          <div class="acct-theme only-mobile-menu">{$toggleMenu}</div>
+          <a href="/logout" class="danger">Log Out</a>
+        </div>
+      </div>
     </div>
   </div>
 </header>

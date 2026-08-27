@@ -152,6 +152,14 @@ $memberSince = !empty($user['created_at'])
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* Runs before paint so a light-theme user never sees a dark flash. */
+(function(){try{var t=localStorage.getItem("bluesky-theme");
+if(!t)t="dark";
+document.documentElement.setAttribute("data-theme",t);
+document.documentElement.style.colorScheme=t;}catch(e){}})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile — BlueSky Agency</title>
