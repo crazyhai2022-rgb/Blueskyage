@@ -58,14 +58,9 @@ $stmt = $db->prepare(
     "INSERT INTO orders (user_id, plan, amount, bm_id, business_name, status, coupon_code, discount, original_amount)
      VALUES (?, ?, ?, ?, ?, 'pending_payment', ?, ?, ?)"
 );
-$planLabel = $item['name'];
-if ($depositUsd > 0) {
-    $planLabel .= ' + $' . $depositUsd . ' ad funds';
-}
-
 $stmt->execute([
     $user['id'],
-    $planLabel,
+    $item['name'],
     $amount,
     trim($input['bmid'] ?? ''),
     trim($input['business'] ?? ''),
@@ -74,6 +69,25 @@ $stmt->execute([
     $original + $depositInr,
 ]);
 $orderId = (int)$db->lastInsertId();
+
+// Everything the invoice needs, stored as real fields rather than
+// squashed into the business name.
+$db->prepare(
+    "UPDATE orders SET plan_slug = ?, deposit_usd = ?, usd_rate = ?, platform_fee = ?,
+            contact_name = ?, contact_phone = ?, contact_email = ?, profile_link = ?, page_name = ?
+     WHERE id = ?"
+)->execute([
+    strtolower(trim($input['plan'])),
+    $depositUsd,
+    $depositUsd > 0 ? (int)($item['usd_rate'] ?? 105) : null,
+    0,
+    trim($input['fullname'] ?? $user['name']),
+    trim($input['phone'] ?? $user['phone'] ?? ''),
+    trim($input['email'] ?? $user['email']),
+    trim($input['profile_link'] ?? ''),
+    trim($input['page_name'] ?? ''),
+    $orderId,
+]);
 
 if ($coupon) {
     $db->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?")->execute([$coupon['id']]);

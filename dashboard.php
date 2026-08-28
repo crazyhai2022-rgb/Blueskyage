@@ -58,6 +58,7 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
     <?php else: ?>
       <?php foreach ($orders as $o): ?>
         <div class="order-card">
+          <a class="order-open" href="/order?id=<?= (int)$o['id'] ?>" aria-label="View order details"></a>
           <div class="order-card-top">
             <div>
               <?php $isPlan = stripos($o['plan'], 'Plan') !== false; ?>
@@ -84,6 +85,11 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
           <?php if (!empty($o['coupon_code'])): ?>
             <p class="order-coupon">Coupon <b><?= e($o['coupon_code']) ?></b> applied — you saved ₹<?= number_format((int)$o['discount']) ?></p>
           <?php endif; ?>
+
+          <div class="order-actions">
+            <a href="/order?id=<?= (int)$o['id'] ?>" class="btn btn-ghost btn-sm">View Details</a>
+            <a href="/order?id=<?= (int)$o['id'] ?>#invoiceDoc" class="btn btn-ghost btn-sm">Invoice</a>
+          </div>
 
           <?php
             $det = json_decode($o['details'] ?? '', true);

@@ -19,6 +19,7 @@ DirectoryIndex index.php index.html
 
   # Admin form posts to a clean path
   RewriteRule ^admin/update-order/?$ admin/update_order.php [L]
+  RewriteRule ^admin/order/?$ admin/order.php [L]
 
   # Then serve the real file behind the clean URL. PHP is checked first so a
   # leftover .html from an earlier deploy can never shadow the live page.

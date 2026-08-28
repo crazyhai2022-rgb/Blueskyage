@@ -220,6 +220,36 @@ class SupabaseStatement {
             ]);
             $this->db->lastInsertIdValue = $res[0]['id'] ?? null;
 
+        } elseif (preg_match('/^UPDATE orders SET plan_slug = \?, deposit_usd = \?, usd_rate = \?, platform_fee = \?, contact_name = \?, contact_phone = \?, contact_email = \?, profile_link = \?, page_name = \? WHERE id = \?$/i', $sql)) {
+            $this->db->request('PATCH', 'orders?id=eq.' . (int)$params[9], [
+                'plan_slug' => $params[0], 'deposit_usd' => (int)$params[1],
+                'usd_rate' => $params[2] === null ? null : (int)$params[2],
+                'platform_fee' => (int)$params[3],
+                'contact_name' => $params[4], 'contact_phone' => $params[5],
+                'contact_email' => $params[6], 'profile_link' => $params[7],
+                'page_name' => $params[8],
+            ]);
+
+        } elseif (preg_match('/^SELECT o\.\*, u\.name AS user_name, u\.email, u\.phone FROM orders o JOIN users u ON u\.id = o\.user_id WHERE o\.id = \?$/i', $sql)) {
+            $raw = $this->db->request('GET', 'orders?select=*,users(name,email,phone)&id=eq.' . (int)$params[0]);
+            $this->rows = array_map(function ($o) {
+                $u = $o['users'] ?? [];
+                unset($o['users']);
+                return $o + ['user_name' => $u['name'] ?? '', 'email' => $u['email'] ?? '', 'phone' => $u['phone'] ?? ''];
+            }, $raw);
+
+        } elseif (preg_match('/^UPDATE orders SET invoice_no = \?, plan = \?, amount = \?, bm_id = \?, business_name = \?, slot_id = \?, ad_account_id = \?, status = \?, deposit_usd = \?, usd_rate = \?, platform_fee = \?, contact_name = \?, contact_phone = \?, contact_email = \?, admin_note = \? WHERE id = \?$/i', $sql)) {
+            $this->db->request('PATCH', 'orders?id=eq.' . (int)$params[15], [
+                'invoice_no' => $params[0] ?: null, 'plan' => $params[1], 'amount' => (int)$params[2],
+                'bm_id' => $params[3], 'business_name' => $params[4], 'slot_id' => $params[5],
+                'ad_account_id' => $params[6], 'status' => $params[7],
+                'deposit_usd' => (int)$params[8],
+                'usd_rate' => $params[9] === null || $params[9] === '' ? null : (int)$params[9],
+                'platform_fee' => (int)$params[10],
+                'contact_name' => $params[11], 'contact_phone' => $params[12],
+                'contact_email' => $params[13], 'admin_note' => $params[14],
+            ]);
+
         } elseif (preg_match('/^SELECT \* FROM coupons WHERE code = \?$/i', $sql)) {
             $this->rows = $this->db->request('GET', 'coupons?select=*&code=eq.' . rawurlencode($params[0]));
 

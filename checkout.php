@@ -352,15 +352,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
   const el = id => document.getElementById(id);
   const val = id => (el(id) ? el(id).value.trim() : '');
 
-  // Everything the plan asked for, kept together on the order record.
-  const extras = [
-    val('profile_link') ? 'Profile: ' + val('profile_link') : '',
-    val('page_name') ? 'Page name: ' + val('page_name') : '',
-    depositUsd > 0 ? 'Deposit: $' + depositUsd + ' (\u20B9' + (depositUsd * USD_RATE) + ')' : ''
-  ].filter(Boolean).join(' | ');
-
-  const businessName = val('business') || '—';
-  const business = businessName + (extras ? ' (' + extras + ')' : '');
+  const businessName = val('business') || '';
 
   try {
     const res = await fetch('api/create_order.php', {
@@ -368,10 +360,14 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
       body: JSON.stringify({
         plan: PLAN_SLUG,
         bmid: val('bmid'),
-        business: business,
+        business: businessName,
         coupon: appliedCoupon,
         deposit_usd: depositUsd,
-        phone: (el('ccode') ? el('ccode').value : '') + ' ' + val('phone')
+        fullname: val('fullname'),
+        email: val('email'),
+        phone: (el('ccode') ? el('ccode').value + ' ' : '') + val('phone'),
+        profile_link: val('profile_link'),
+        page_name: val('page_name')
       })
     });
     const data = await res.json();

@@ -23,6 +23,7 @@ deployment:
     - /bin/cp -f login.php $DEPLOYPATH
     - /bin/cp -f logout.php $DEPLOYPATH
     - /bin/cp -f dashboard.php $DEPLOYPATH
+    - /bin/cp -f order.php $DEPLOYPATH
     - /bin/cp -f profile.php $DEPLOYPATH
     - /bin/cp -f checkout.php $DEPLOYPATH
     - /bin/cp -f config.example.php $DEPLOYPATH

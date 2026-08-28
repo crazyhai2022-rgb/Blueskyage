@@ -90,7 +90,7 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
         </tr>
         <?php foreach ($orders as $o): ?>
         <tr>
-          <td><?= e($o['invoice_no'] ?: '#' . $o['id']) ?></td>
+          <td><a href="/admin/order?id=<?= (int)$o['id'] ?>" class="admin-open"><?= e($o['invoice_no'] ?: '#' . $o['id']) ?></a></td>
           <td><?= e($o['user_name']) ?><br><span style="color:var(--mist-dim);font-size:11.5px;"><?= e($o['phone']) ?></span></td>
           <td><?= e($o['plan']) ?></td>
           <td>₹<?= (int)$o['amount'] ?><?php if (!empty($o['discount'])): ?><br><span style="color:var(--mist-dim);font-size:11px;text-decoration:line-through;">₹<?= (int)$o['original_amount'] ?></span><?php endif; ?></td>
@@ -129,6 +129,7 @@ document.documentElement.style.colorScheme=t;}catch(e){}})();
                 <option value="cancelled" <?= $o['status']==='cancelled'?'selected':'' ?>>Cancelled</option>
               </select>
               <button type="submit" class="btn btn-primary btn-sm">Save</button>
+              <a href="/admin/order?id=<?= (int)$o['id'] ?>" class="btn btn-ghost btn-sm">Open</a>
             </form>
           </td>
         </tr>
