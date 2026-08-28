@@ -34,7 +34,7 @@ foreach ($stats as $s) {
 <script>
 /* Runs before paint so a light-theme user never sees a dark flash. */
 (function(){try{var t=localStorage.getItem("bluesky-theme");
-if(!t)t="dark";
+if(!t)t="light";
 document.documentElement.setAttribute("data-theme",t);
 document.documentElement.style.colorScheme=t;}catch(e){}})();
 </script>
