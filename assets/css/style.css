@@ -1297,14 +1297,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, .btn:focus-visible{
   transition: background .18s ease, border-color .18s ease, color .18s ease;
 }
 .theme-toggle:hover { background: var(--glass-strong); border-color: var(--glass-border-strong); color: var(--white); }
-.theme-toggle svg { width: 17px; height: 17px; flex: 0 0 17px; display: block; }
+.theme-toggle svg { width: 17px; height: 17px; flex: 0 0 17px; }
 .theme-toggle-label { display: none; }
 
 /* show the icon for the theme you'd switch TO */
-.icon-sun { display: none; }
-.icon-moon { display: block; }
-[data-theme="light"] .icon-sun { display: block; }
-[data-theme="light"] .icon-moon { display: none; }
+/* Dark theme shows the moon, light theme shows the sun. */
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
 /* avatar button: rounder ring, caret alongside */
 .acct-btn-plain {
